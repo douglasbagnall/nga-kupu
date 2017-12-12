@@ -81,5 +81,6 @@ def matua():
     tuhi_puta_tuhinga(kupu_hou)
     tatau_tupu(kupu_tūtira_pīki, kupu_hou)
 
+if __name__=='__main__':
+    matua()
 
-matua()
