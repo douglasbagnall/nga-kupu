@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+# Returns a list of all māori words and tells the user what percentage of words are considered 'english' or 'māori'
+
+import re
+import sys
+import argparse
+
+from taumahi import tangohia_kupu_tōkau, whakatū_aho, raupapa_tohu, auaha_kupu_tūtira, poro_tūtira, tuhi_puta_tuhinga, tatau_tupu
+
+def matua():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', help="Input multilanguage corpus text file")
+    parser.add_argument('--output', '-o', help="Output text file where words that are considered to be Māori are stored")
+    args = parser.parse_args()
+    kupu_tōkau = tangohia_kupu_tōkau(args)
+    oropurae, orokati, pūriki_pākehā = whakatū_aho()
+    kupu_tūtira_pīki = auaha_kupu_tūtira(kupu_tōkau)
+    kupu_hou = poro_tūtira(oropurae, orokati, pūriki_pākehā, kupu_tūtira_pīki)
+    tuhi_puta_tuhinga(args, kupu_hou)
+    tatau_tupu(kupu_tūtira_pīki, kupu_hou)
+
+if __name__=='__main__':
+    matua()

@@ -1,4 +1,4 @@
-from dictionary_check import dictionary_check_word, dictionary_check
+from taumahi import dictionary_check_word, dictionary_check
 def test_māori_word():
     assert dictionary_check_word('kupu')
 

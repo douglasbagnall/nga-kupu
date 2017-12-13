@@ -1,13 +1,10 @@
-#returns a list of all māori words and tells the user what percentage of words are considered 'english' or 'māori'
-
 import re
 import sys
-kōnae_mai = sys.argv[1]
-kōnae_atu = sys.argv[2]
+import argparse
 
-def tangohia_kupu_tōkau():
+def tangohia_kupu_tōkau(args):
     # opening the file and reading it to one long string of lowercase characters
-    kōnae = open(kōnae_mai, "r")
+    kōnae = open(args.input, "r")
     kupu_tōkau = kōnae.read().lower()
     kōnae.close()
     return kupu_tōkau
@@ -16,8 +13,12 @@ def whakatū_aho():
     #strings of unicode characters, vowels consonants and non-māori letters, used to distinguish the english words from māori words
     return "aāeēiīoōuū", "hkmnprtwŋf", "bcdfjlqsvxyz"
 
-def raupapa_tohu(oropurae, orokati, kupu_hou):
+def raupapa_tohu(kupu_hou):
     #creates dictionaries for ordering the māori alphabet from the vowel and consonant strings
+    #requires whakatū_aho()
+
+    oropurae, orokati, _ = whakatū_aho()
+
     arapū = oropurae + orokati
     papakupu_kī = "ABCDEFGHIJKLMNOPQRST"
     papakupu_whakamua = {kī:papakupu_kī[wāriutanga - 1] for wāriutanga, kī in enumerate(arapū, 1)}
@@ -38,14 +39,15 @@ def auaha_kupu_tūtira(kupu_tōkau):
     #creates a list of all words in the file string that contain english and/or māori letters, and one of all hyphenated words
     kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau)
     kupu_pāhekoheko = re.findall(r'(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)(?![a-zāēīōū-]*[hkmnprtwg]-)([a-zāēīōū-]+)(?<!-)', kupu_tōkau)
-    print(len(kupu_tūtira))
-    print(len(kupu_pāhekoheko))
     #combines the lists, removes duplicates by transforming into a set and back again
     kupu_tūtira_pīki = list(set(kupu_tūtira + kupu_pāhekoheko))
     return kupu_tūtira_pīki
 
-def poro_tūtira(oropurae, orokati, pūriki_pākehā, kupu_tūtira_pīki):
+def poro_tūtira(kupu_tūtira_pīki):
     #removes words that contain any english characters from the string above
+
+    oropurae, orokati, pūriki_pākehā = whakatū_aho()
+
     kupu_hou = [kupu for kupu in kupu_tūtira_pīki if not any(pūriki in kupu for pūriki in pūriki_pākehā)]
 
     #replaces 'ng' and 'wh' with 'ŋ' and 'f' respectively, since words with english characters have been removed and it is easier to deal with in unicode format
@@ -54,7 +56,7 @@ def poro_tūtira(oropurae, orokati, pūriki_pākehā, kupu_tūtira_pīki):
     #removes words that have english words with māori characters (like "the"), words that end in a consonant, or words with a 'g' that is not preceeded by an 'n'
     kupu_hou = [kupu for kupu in kupu_hou if not (re.compile(r'[fhkmnŋprtw][fhkmnŋprtw]').search(kupu) or (kupu[-1] in orokati) or ("g" in kupu))]
 
-    kupu_hou = raupapa_tohu(oropurae, orokati, kupu_hou)
+    kupu_hou = raupapa_tohu(kupu_hou)
 
     #returns the letters to traditional format from unicode format
     kupu_hou = [re.sub(r'ŋ', 'ng', kupu) for kupu in kupu_hou]
@@ -62,9 +64,9 @@ def poro_tūtira(oropurae, orokati, pūriki_pākehā, kupu_tūtira_pīki):
 
     return kupu_hou
 
-def tuhi_puta_tuhinga(kupu_hou):
+def tuhi_puta_tuhinga(args, kupu_hou):
     #writes the list of words to a new document, each word and hyphenated word on a new line
-    kupu_tūtira_hou = open(kōnae_atu,"w")
+    kupu_tūtira_hou = open(args.output,"w")
     kupu_tōkau_pīki = "\n".join(kupu_hou)
     kupu_tūtira_hou.write(kupu_tōkau_pīki)
     kupu_tūtira_hou.close()
@@ -73,14 +75,34 @@ def tatau_tupu(kupu_tūtira_pīki, kupu_hou):
     percentage = round(float(len(kupu_hou)) / float(len(kupu_tūtira_pīki)) * 100, 2)
     print("This text is " + str(percentage) + "% Māori")
 
-def matua():
-    kupu_tōkau = tangohia_kupu_tōkau()
-    oropurae, orokati, pūriki_pākehā = whakatū_aho()
-    kupu_tūtira_pīki = auaha_kupu_tūtira(kupu_tōkau)
-    kupu_hou = poro_tūtira(oropurae, orokati, pūriki_pākehā, kupu_tūtira_pīki)
-    tuhi_puta_tuhinga(kupu_hou)
-    tatau_tupu(kupu_tūtira_pīki, kupu_hou)
+def dictionary_check_word(kupu_hou, ignore_tohutō=False):
+    # Looks up a single word to see if it is defined in maoridictionary.com
+    # Set ignore_tohutō=True to igbnore macrons when making the match
+    # Returns True or False
 
-if __name__=='__main__':
-    matua()
+    no_tohutō = ''.maketrans({'ā':'a', 'ē':'e', 'ī':'i', 'ō':'o', 'ū':'u'})
 
+    kupu = kupu_hou.lower()
+    if ignore_tohutō:
+        kupu = kupu.translate(no_tohutō)
+    search_page = recode_uri('http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
+    page = urlopen(search_page)
+    soup = BeautifulSoup(page, 'html.parser', from_encoding='utf8')
+
+    titles = soup.find_all('h2')
+    for title in titles[:-3]:
+        if "Found 0 matches" in title.text:
+            return False
+            break
+        elif kupu in (title.text.translate(no_tohutō) if ignore_tohutō else title.text):
+            return True
+            break
+    return False
+
+def dictionary_check(kupu_hou):
+    #looks up a list of words to see if they are defined in maoridictionary.com
+
+    checks = list(map(dictionary_check_word, kupu_hou))
+    good_list =  [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]
+    bad_list  =  [pair[1] for pair in zip(checks, kupu_hou) if not pair[0]]
+    return good_list, bad_list

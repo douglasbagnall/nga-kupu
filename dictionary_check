@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+# Checks words that are considered 'māori' against maoridictionary.co.nz to determine whether they are legitimate words
+import re
+from urllib.request import urlopen
+from yelp_uri.encoding import recode_uri
+from bs4 import BeautifulSoup
+from taumahi import dictionary_check_word, dictionary_check, tangohia_kupu_tōkau, auaha_kupu_tūtira, whakatū_aho, raupapa_tohu, poro_tūtira
+import sys
+import argparse
+
+def dictionary_check_word(kupu_hou, ignore_tohutō=False):
+    # Looks up a single word to see if it is defined in maoridictionary.com
+    # Set ignore_tohutō=True to igbnore macrons when making the match
+    # Returns True or False
+
+    no_tohutō = ''.maketrans({'ā':'a', 'ē':'e', 'ī':'i', 'ō':'o', 'ū':'u'})
+
+    kupu = kupu_hou.lower()
+    if ignore_tohutō:
+        kupu = kupu.translate(no_tohutō)
+    search_page = recode_uri('http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
+    page = urlopen(search_page)
+    soup = BeautifulSoup(page, 'html.parser', from_encoding='utf8')
+
+    titles = soup.find_all('h2')
+    for title in titles[:-3]:
+        if "Found 0 matches" in title.text:
+            return False
+            break
+        elif kupu in (title.text.translate(no_tohutō) if ignore_tohutō else title.text):
+            return True
+            break
+    return False
+
+def dictionary_check(kupu_hou):
+    #looks up a list of words to see if they are defined in maoridictionary.com
+
+    checks = list(map(dictionary_check_word, kupu_hou))
+    good_list =  [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]
+    bad_list  =  [pair[1] for pair in zip(checks, kupu_hou) if not pair[0]]
+    return good_list, bad_list
+
+def tuhi_puta_tuhinga(args, good_list, bad_list):
+    #writes the list of words to a new document, each word and hyphenated word on a new line
+    kupu_tūtira_hou = open(args.good_output,"w")
+    kupu_tūtira_hou.write("\n".join(good_list))
+    kupu_tūtira_hou.close()
+
+    kupu_tūtira_hou = open(args.bad_output,"w")
+    kupu_tūtira_hou.write("\n".join(bad_list))
+    kupu_tūtira_hou.close()
+
+def matua():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', help="Input text file")
+    parser.add_argument('--good_output', '-g', help="Output text file where defined Māori word are stored")
+    parser.add_argument('--bad_output', '-b', help="Output text file where defined Māori word are stored")
+    parser.add_argument('--text', '-t', help="Switch to determine if input text file is a list of words or not (one word per line)", action="store_true")
+    parser.add_argument('--prune', '-p', help="Switch to determine whether input text file is multi or monolingual", action="store_true")
+    args = parser.parse_args()
+    kupu_tōkau = tangohia_kupu_tōkau(args)
+
+    if args.text:
+        kupu_tūtira = auaha_kupu_tūtira(kupu_tōkau)
+    else:
+        kupu_tūtira = kupu_tōkau.split("\n")
+
+    if args.prune:
+        kupu_hou = poro_tūtira(kupu_tūtira)
+    else:
+        kupu_hou = kupu_tūtira
+
+    good_list, bad_list = dictionary_check(kupu_hou)
+    tuhi_puta_tuhinga(args, good_list, bad_list)
+
+if __name__=='__main__':
+    matua()
