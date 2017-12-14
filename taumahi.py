@@ -5,7 +5,14 @@ from yelp_uri.encoding import recode_uri
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
+oropurae = "aāeēiīoōuū"
+orokati = "hkmnprtwŋf"
+pūriki_pākehā = "bcdfjlqsvxyz"
+papakupu_kī = "ABCDEFGHIJKLMNOPQRST"
+no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
+arapū = oropurae + orokati
 
+## Anything to do with file in and out put in the scripts ...
 def tangohia_kupu_tōkau(args):
     # opening the file and reading it to one long string of lowercase characters
     kōnae = open(args.input, "r")
@@ -13,20 +20,9 @@ def tangohia_kupu_tōkau(args):
     kōnae.close()
     return kupu_tōkau
 
-
-def whakatū_aho():
-    # strings of unicode characters, vowels consonants and non-māori letters, used to distinguish the english words from māori words
-    return "aāeēiīoōuū", "hkmnprtwŋf", "bcdfjlqsvxyz"
-
-
 def raupapa_tohu(kupu_hou):
     # creates dictionaries for ordering the māori alphabet from the vowel and consonant strings
-    # requires whakatū_aho()
 
-    oropurae, orokati, _ = whakatū_aho()
-
-    arapū = oropurae + orokati
-    papakupu_kī = "ABCDEFGHIJKLMNOPQRST"
     papakupu_whakamua = {kī: papakupu_kī[wāriutanga - 1]
                          for wāriutanga, kī in enumerate(arapū, 1)}
     papakupu_whakamuri = {
@@ -47,18 +43,19 @@ def raupapa_tohu(kupu_hou):
 
 def auaha_kupu_tūtira(kupu_tōkau):
     # creates a list of all words in the file string that contain english and/or māori letters, and one of all hyphenated words
-    kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau)
-    kupu_pāhekoheko = re.findall(
-        r'(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)(?![a-zāēīōū-]*[hkmnprtwg]-)([a-zāēīōū-]+)(?<!-)', kupu_tōkau)
+    #kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau, flags=re.IGNORECASE))
+
+    # keep English and Maori consistently
+    return re.findall(r'(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)(?![a-zāēīōū-]*[hkmnprtwg]-)([a-zāēīōū-]+)(?<!-)', kupu_tōkau, flags=re.IGNORECASE)
+
+    # Don't uniquify
     # combines the lists, removes duplicates by transforming into a set and back again
-    kupu_tūtira_pīki = list(set(kupu_tūtira + kupu_pāhekoheko))
-    return kupu_tūtira_pīki
+    #kupu_tūtira_pīki = list(set(kupu_tūtira + kupu_pāhekoheko))
+    #return kupu_tūtira_pīki
 
 
 def poro_tūtira(kupu_tūtira_pīki):
     # removes words that contain any english characters from the string above
-
-    oropurae, orokati, pūriki_pākehā = whakatū_aho()
 
     kōnae = open("kupu_kino.txt", "r")
     kupu_pākehā = kōnae.read().split()
@@ -71,7 +68,7 @@ def poro_tūtira(kupu_tūtira_pīki):
     kupu_hou = [re.sub(r'ng', 'ŋ', kupu) for kupu in kupu_hou]
     kupu_hou = [re.sub(r'wh', 'f', kupu) for kupu in kupu_hou]
     # removes words that have english words with māori characters (like "the"), words that end in a consonant, or words with a 'g' that is not preceeded by an 'n'
-    kupu_hou = [kupu for kupu in kupu_hou if not (re.compile(r'[fhkmnŋprtw][fhkmnŋprtw]').search(
+    kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
         kupu) or (kupu[-1] in orokati) or ("g" in kupu))]
 
     kupu_hou = raupapa_tohu(kupu_hou)
@@ -101,9 +98,6 @@ def dictionary_check_word(kupu_hou, ignore_tohutō=True):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
     # Returns True or False
-
-    no_tohutō = ''.maketrans(
-        {'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 
     kupu = kupu_hou.lower()
     if ignore_tohutō:
