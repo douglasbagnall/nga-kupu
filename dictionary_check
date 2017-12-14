@@ -1,7 +1,14 @@
 #!/usr/bin/python3
 # Checks words that are considered 'māori' against maoridictionary.co.nz to determine whether they are legitimate words
-from taumahi import dictionary_check_word, dictionary_check, tangohia_kupu_tōkau, auaha_kupu_tūtira, whakatū_aho, raupapa_tohu, poro_tūtira
+from taumahi import dictionary_check, tangohia_kupu_tōkau, auaha_kupu_tūtira, raupapa_tohu, poro_tūtira
 import argparse
+
+
+def tangohia_kupu_tōkau(args):
+    kōnae = open(args.input, 'r')
+    kupu_tōkau = kōnae.read()
+    kōnae.close()
+    return kupu_tōkau
 
 
 def tuhi_puta_tuhinga(args, good_list, bad_list):

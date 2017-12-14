@@ -8,6 +8,20 @@ import argparse
 from taumahi import tangohia_kupu_tōkau, auaha_kupu_tūtira, poro_tūtira, tuhi_puta_tuhinga
 
 
+def tangohia_kupu_tōkau(args):
+    kōnae = open(args.input, 'r')
+    kupu_tōkau = kōnae.read()
+    kōnae.close()
+    return kupu_tōkau
+
+
+def tuhi_puta_tuhinga(args, kupu_hou):
+    # writes the list of words to a new document, each word and hyphenated word on a new line
+    kupu_tūtira_hou = open(args.output, "w")
+    kupu_tūtira_hou.write("\n".join(kupu_hou))
+    kupu_tūtira_hou.close()
+
+
 def matua():
     parser = argparse.ArgumentParser()
     parser.add_argument(

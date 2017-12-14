@@ -35,3 +35,7 @@ def test_space():
 
 def test_stop_list():
     assert poro_tūtira(['aia']) == []
+
+
+def test_case_sensitivity():
+    assert poro_tūtira(['You', 'Aia', 'Kupu', "You're"]) == ['Kupu']
