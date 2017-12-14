@@ -1,6 +1,9 @@
 import re
 import sys
 import argparse
+from yelp_uri.encoding import recode_uri
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
 
 def tangohia_kupu_tōkau(args):
@@ -28,7 +31,6 @@ def raupapa_tohu(kupu_hou):
                          for wāriutanga, kī in enumerate(arapū, 1)}
     papakupu_whakamuri = {
         papakupu_kī[kī - 1]: wāriutanga for kī, wāriutanga in enumerate(arapū, 1)}
-
     # sorts into māori alphabetical order
     for arapū_pūriki in arapū:
         kupu_hou = [re.sub(arapū_pūriki, papakupu_whakamua[arapū_pūriki], kupu)
@@ -58,15 +60,19 @@ def poro_tūtira(kupu_tūtira_pīki):
 
     oropurae, orokati, pūriki_pākehā = whakatū_aho()
 
-    kupu_hou = [kupu for kupu in kupu_tūtira_pīki if not any(
-        pūriki in kupu for pūriki in pūriki_pākehā)]
+    kōnae = open("kupu_kino.txt", "r")
+    kupu_pākehā = kōnae.read().split()
+    kōnae.close()
+
+    kupu_hou = [kupu for kupu in kupu_tūtira_pīki if not (any(
+        pūriki in kupu for pūriki in pūriki_pākehā) or (kupu in kupu_pākehā))]
 
     # replaces 'ng' and 'wh' with 'ŋ' and 'f' respectively, since words with english characters have been removed and it is easier to deal with in unicode format
     kupu_hou = [re.sub(r'ng', 'ŋ', kupu) for kupu in kupu_hou]
     kupu_hou = [re.sub(r'wh', 'f', kupu) for kupu in kupu_hou]
     # removes words that have english words with māori characters (like "the"), words that end in a consonant, or words with a 'g' that is not preceeded by an 'n'
-    kupu_hou = [kupu for kupu in kupu_hou if not (re.compile(
-        r'[fhkmnŋprtw][fhkmnŋprtw]').search(kupu) or (kupu[-1] in orokati) or ("g" in kupu))]
+    kupu_hou = [kupu for kupu in kupu_hou if not (re.compile(r'[fhkmnŋprtw][fhkmnŋprtw]').search(
+        kupu) or (kupu[-1] in orokati) or ("g" in kupu))]
 
     kupu_hou = raupapa_tohu(kupu_hou)
 
@@ -91,9 +97,9 @@ def tatau_tupu(text):
     return len(kupu_hou), len(kupu_tūtira_pīki)
 
 
-def dictionary_check_word(kupu_hou, ignore_tohutō=False):
-    # Looks up a single word to see if it is defined in maoridictionary.com
-    # Set ignore_tohutō=True to igbnore macrons when making the match
+def dictionary_check_word(kupu_hou, ignore_tohutō=True):
+    # Looks up a single word to see if it is defined in maoridictionary.co.nz
+    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
     # Returns True or False
 
     no_tohutō = ''.maketrans(
@@ -109,17 +115,18 @@ def dictionary_check_word(kupu_hou, ignore_tohutō=False):
 
     titles = soup.find_all('h2')
     for title in titles[:-3]:
-        if "Found 0 matches" in title.text:
+        title = title.text.lower()
+        if "found 0 matches" in title:
             return False
             break
-        elif kupu in (title.text.translate(no_tohutō) if ignore_tohutō else title.text):
+        elif kupu in (title.translate(no_tohutō).split() if ignore_tohutō else title.split()):
             return True
             break
     return False
 
 
 def dictionary_check(kupu_hou):
-    # looks up a list of words to see if they are defined in maoridictionary.com
+    # Looks up a list of words to see if they are defined in maoridictionary.co.nz
 
     checks = list(map(dictionary_check_word, kupu_hou))
     good_list = [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]

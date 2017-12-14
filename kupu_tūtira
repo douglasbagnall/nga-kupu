@@ -5,7 +5,7 @@ import re
 import sys
 import argparse
 
-from taumahi import tangohia_kupu_tōkau, whakatū_aho, raupapa_tohu, auaha_kupu_tūtira, poro_tūtira, tuhi_puta_tuhinga, tatau_tupu
+from taumahi import tangohia_kupu_tōkau, auaha_kupu_tūtira, poro_tūtira, tuhi_puta_tuhinga
 
 
 def matua():
@@ -14,6 +14,7 @@ def matua():
         '--input', '-i', help="Input multilanguage corpus text file")
     parser.add_argument(
         '--output', '-o', help="Output text file where words that are considered to be Māori are stored")
+
     args = parser.parse_args()
     kupu_tōkau = tangohia_kupu_tōkau(args)
     kupu_tūtira_pīki = auaha_kupu_tūtira(kupu_tōkau)
