@@ -5,12 +5,12 @@ from yelp_uri.encoding import recode_uri
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
-oropurae = "aāeēiīoōuū"
+oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
-pūriki_pākehā = "bcdfjlqsvxyz'"
-papakupu_kī = "αβγδεζθικλμνξπρςστυφ"
+pūriki_pākehā = "bcdfgjlqsvxyz'"
+papakupu_kī = "ABCDEFJHIJKLMNOPQRST"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
-arapū = oropurae + orokati
+arapū = oropuare + orokati
 
 
 def raupapa_tohu(kupu_hou):
@@ -39,8 +39,8 @@ def auaha_kupu_tūtira(kupu_tōkau):
     # kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau, flags=re.IGNORECASE)
 
     # Keep English and Māori consistently
-    kupu_pāhekoheko = re.findall(
-        r"(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)([a-zāēīōū-']+)(?<!-)", kupu_tōkau, flags=re.IGNORECASE)
+    kupu_pāhekoheko = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
+        p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
     # Don't uniquify
     # combines the lists, removes duplicates by transforming into a set and back again
@@ -48,27 +48,33 @@ def auaha_kupu_tūtira(kupu_tōkau):
     return kupu_pāhekoheko
 
 
-def poro_tūtira(kupu_hou):
+def poro_tūtira(kupu_hou, ignore_tohutō=True):
     # Removes words that contain any English characters from the string above
+    # Set ignore_tohutō=True to become sensitive to the presence of macrons when making the match
 
-    kōnae = open("kupu_kino.txt", "r")
-    kupu_pākehā = kōnae.read().split()
-    kōnae.close()
+    if ignore_tohutō:
+        kōnae = open("kupu_kino.txt", "r")
+        kupu_pākehā = kōnae.read().split()
+        kōnae.close()
+    else:
+        kōnae = open("kupu_kino_no_tohutō.txt", "r")
+        kupu_pākehā = kōnae.read().split()
+        kōnae.close()
 
     # Replaces 'ng' and 'wh' with 'ŋ' and 'ƒ' respectively, since words with English characters have been removed and it is easier to deal with in unicode format
-    kupu_hou = [re.sub(r'ng', 'ŋ', kupu) for kupu in kupu_hou]
-    kupu_hou = [re.sub(r'wh', 'ƒ', kupu) for kupu in kupu_hou]
+    kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
+        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou]
 
     # Removes words that are English but contain Māori characters (like "the"), words that end in a consonant, words with a 'g' that is not preceeded by an 'n', words that have English characters and words that are in the stoplist of Māori-seeming english words.
     kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
-        kupu.lower()) or (kupu[-1] in orokati) or ("g" in kupu.lower()) or any(
+        kupu.lower()) or (kupu[-1].lower() in orokati) or any(
             pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā))]
 
     # kupu_hou = raupapa_tohu(kupu_hou)
 
     # Returns the letters to traditional format from unicode format
-    kupu_hou = [re.sub(r'ŋ', 'ng', kupu) for kupu in kupu_hou]
-    kupu_hou = [re.sub(r'ƒ', 'wh', kupu) for kupu in kupu_hou]
+    kupu_hou = [re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
+                for kupu in kupu_hou]
 
     return kupu_hou
 
@@ -79,9 +85,9 @@ def tatau_tupu(text):
     return len(kupu_hou), len(kupu_tūtira_pīki)
 
 
-def dictionary_check_word(kupu_hou, ignore_tohutō=True):
+def dictionary_check_word(kupu_hou, ignore_tohutō=False):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
-    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
+    # Set ignore_tohutō=False to not ignore macrons when making the match
     # Returns True or False
 
     kupu = kupu_hou.lower()
@@ -106,8 +112,10 @@ def dictionary_check_word(kupu_hou, ignore_tohutō=True):
 
 def dictionary_check(kupu_hou):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
+    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
 
     checks = list(map(dictionary_check_word, kupu_hou))
+
     good_list = [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]
     bad_list = [pair[1] for pair in zip(checks, kupu_hou) if not pair[0]]
     return good_list, bad_list

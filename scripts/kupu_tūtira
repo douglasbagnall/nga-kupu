@@ -5,7 +5,7 @@ import re
 import sys
 import argparse
 
-from taumahi import tangohia_kupu_tōkau, auaha_kupu_tūtira, poro_tūtira, tuhi_puta_tuhinga
+from taumahi import auaha_kupu_tūtira, poro_tūtira
 
 
 def tangohia_kupu_tōkau(args):
