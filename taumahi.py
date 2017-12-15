@@ -39,8 +39,8 @@ def auaha_kupu_tūtira(kupu_tōkau):
     # kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau, flags=re.IGNORECASE)
 
     # Keep English and Māori consistently
-    kupu_pāhekoheko = re.findall(
-        r"(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)([a-zāēīōū\-\']+)(?<!-)", kupu_tōkau, flags=re.IGNORECASE)
+    kupu_pāhekoheko = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
+        p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
     # Don't uniquify
     # combines the lists, removes duplicates by transforming into a set and back again
@@ -62,8 +62,8 @@ def poro_tūtira(kupu_hou, ignore_tohutō=False):
     #     kōnae.close()
 
     # Replaces 'ng' and 'wh' with 'ŋ' and 'ƒ' respectively, since words with English characters have been removed and it is easier to deal with in unicode format
-    kupu_hou = [re.sub(r'ng', 'ŋ', kupu) for kupu in kupu_hou]
-    kupu_hou = [re.sub(r'wh', 'ƒ', kupu) for kupu in kupu_hou]
+    kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
+        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou]
 
     # Removes words that are English but contain Māori characters (like "the"), words that end in a consonant, words with a 'g' that is not preceeded by an 'n', words that have English characters and words that are in the stoplist of Māori-seeming english words.
     kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
@@ -73,8 +73,8 @@ def poro_tūtira(kupu_hou, ignore_tohutō=False):
     # kupu_hou = raupapa_tohu(kupu_hou)
 
     # Returns the letters to traditional format from unicode format
-    kupu_hou = [re.sub(r'ŋ', 'ng', kupu) for kupu in kupu_hou]
-    kupu_hou = [re.sub(r'ƒ', 'wh', kupu) for kupu in kupu_hou]
+    kupu_hou = [re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
+                for kupu in kupu_hou]
 
     return kupu_hou
 
