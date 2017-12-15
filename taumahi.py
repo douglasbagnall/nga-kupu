@@ -5,12 +5,12 @@ from yelp_uri.encoding import recode_uri
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
-oropurae = "aāeēiīoōuū"
+oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
 pūriki_pākehā = "bcdfjlqsvxyz'"
-papakupu_kī = "αβγδεζθικλμνξπρςστυφ"
+papakupu_kī = "ABCDEFJHIJKLMNOPQRST"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
-arapū = oropurae + orokati
+arapū = oropuare + orokati
 
 
 def raupapa_tohu(kupu_hou):
@@ -40,7 +40,7 @@ def auaha_kupu_tūtira(kupu_tōkau):
 
     # Keep English and Māori consistently
     kupu_pāhekoheko = re.findall(
-        r"(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)([a-zāēīōū-']+)(?<!-)", kupu_tōkau, flags=re.IGNORECASE)
+        r"(?!-)(?![a-zāēīōū-]*--[a-zāēīōū-]*)([a-zāēīōū\-\']+)(?<!-)", kupu_tōkau, flags=re.IGNORECASE)
 
     # Don't uniquify
     # combines the lists, removes duplicates by transforming into a set and back again
@@ -48,12 +48,18 @@ def auaha_kupu_tūtira(kupu_tōkau):
     return kupu_pāhekoheko
 
 
-def poro_tūtira(kupu_hou):
+def poro_tūtira(kupu_hou, ignore_tohutō=False):
     # Removes words that contain any English characters from the string above
+    # Set ignore_tohutō=True to become sensitive to the presence of macrons when making the match
 
-    kōnae = open("kupu_kino.txt", "r")
-    kupu_pākehā = kōnae.read().split()
-    kōnae.close()
+    # if ignore_tohutō:
+    #     kōnae = open("kupu_kino.txt", "r")
+    #     kupu_pākehā = kōnae.read().split()
+    #     kōnae.close()
+    # else:
+    #     kōnae = open("kupu_kino_no_tohutō.txt", "r")
+    #     kupu_pākehā = kōnae.read().split()
+    #     kōnae.close()
 
     # Replaces 'ng' and 'wh' with 'ŋ' and 'ƒ' respectively, since words with English characters have been removed and it is easier to deal with in unicode format
     kupu_hou = [re.sub(r'ng', 'ŋ', kupu) for kupu in kupu_hou]
@@ -61,8 +67,8 @@ def poro_tūtira(kupu_hou):
 
     # Removes words that are English but contain Māori characters (like "the"), words that end in a consonant, words with a 'g' that is not preceeded by an 'n', words that have English characters and words that are in the stoplist of Māori-seeming english words.
     kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
-        kupu.lower()) or (kupu[-1] in orokati) or ("g" in kupu.lower()) or any(
-            pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā))]
+        kupu.lower()) or (kupu[-1].lower() in orokati) or ("g" in kupu.lower()) or any(
+            pūriki in kupu.lower() for pūriki in pūriki_pākehā))]
 
     # kupu_hou = raupapa_tohu(kupu_hou)
 
@@ -81,7 +87,7 @@ def tatau_tupu(text):
 
 def dictionary_check_word(kupu_hou, ignore_tohutō=True):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
-    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
+    # Set ignore_tohutō=False to not ignore macrons when making the match
     # Returns True or False
 
     kupu = kupu_hou.lower()
@@ -104,10 +110,12 @@ def dictionary_check_word(kupu_hou, ignore_tohutō=True):
     return False
 
 
-def dictionary_check(kupu_hou):
+def dictionary_check(kupu_hou, ignore_tohutō=True):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
+    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
 
     checks = list(map(dictionary_check_word, kupu_hou))
+
     good_list = [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]
     bad_list = [pair[1] for pair in zip(checks, kupu_hou) if not pair[0]]
     return good_list, bad_list
