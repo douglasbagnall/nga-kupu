@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
-pūriki_pākehā = "bcdfjlqsvxyz'"
+pūriki_pākehā = "bcdfgjlqsvxyz'"
 papakupu_kī = "ABCDEFJHIJKLMNOPQRST"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 arapū = oropuare + orokati
@@ -48,18 +48,18 @@ def auaha_kupu_tūtira(kupu_tōkau):
     return kupu_pāhekoheko
 
 
-def poro_tūtira(kupu_hou, ignore_tohutō=False):
+def poro_tūtira(kupu_hou, ignore_tohutō=True):
     # Removes words that contain any English characters from the string above
     # Set ignore_tohutō=True to become sensitive to the presence of macrons when making the match
 
-    # if ignore_tohutō:
-    #     kōnae = open("kupu_kino.txt", "r")
-    #     kupu_pākehā = kōnae.read().split()
-    #     kōnae.close()
-    # else:
-    #     kōnae = open("kupu_kino_no_tohutō.txt", "r")
-    #     kupu_pākehā = kōnae.read().split()
-    #     kōnae.close()
+    if ignore_tohutō:
+        kōnae = open("kupu_kino.txt", "r")
+        kupu_pākehā = kōnae.read().split()
+        kōnae.close()
+    else:
+        kōnae = open("kupu_kino_no_tohutō.txt", "r")
+        kupu_pākehā = kōnae.read().split()
+        kōnae.close()
 
     # Replaces 'ng' and 'wh' with 'ŋ' and 'ƒ' respectively, since words with English characters have been removed and it is easier to deal with in unicode format
     kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
@@ -67,8 +67,8 @@ def poro_tūtira(kupu_hou, ignore_tohutō=False):
 
     # Removes words that are English but contain Māori characters (like "the"), words that end in a consonant, words with a 'g' that is not preceeded by an 'n', words that have English characters and words that are in the stoplist of Māori-seeming english words.
     kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
-        kupu.lower()) or (kupu[-1].lower() in orokati) or ("g" in kupu.lower()) or any(
-            pūriki in kupu.lower() for pūriki in pūriki_pākehā))]
+        kupu.lower()) or (kupu[-1].lower() in orokati) or any(
+            pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā))]
 
     # kupu_hou = raupapa_tohu(kupu_hou)
 
@@ -85,7 +85,7 @@ def tatau_tupu(text):
     return len(kupu_hou), len(kupu_tūtira_pīki)
 
 
-def dictionary_check_word(kupu_hou, ignore_tohutō=True):
+def dictionary_check_word(kupu_hou, ignore_tohutō=False):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set ignore_tohutō=False to not ignore macrons when making the match
     # Returns True or False
@@ -110,7 +110,7 @@ def dictionary_check_word(kupu_hou, ignore_tohutō=True):
     return False
 
 
-def dictionary_check(kupu_hou, ignore_tohutō=True):
+def dictionary_check(kupu_hou):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
     # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
 

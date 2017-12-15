@@ -32,10 +32,5 @@ def test_waitangi():
 def test_space():
     assert not dictionary_check_word(' Pōneke')
 
-
-def test_stop_list():
-    assert poro_tūtira(['aia']) == []
-
-
-def test_case_sensitivity():
-    assert poro_tūtira(['You', 'Aia', 'Kupu', "You're"]) == ['Kupu']
+def test_dictionary_check_word():
+    assert not dictionary_check_word('ae')

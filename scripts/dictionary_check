@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # Checks words that are considered 'māori' against maoridictionary.co.nz to determine whether they are legitimate words
-from taumahi import dictionary_check, tangohia_kupu_tōkau, auaha_kupu_tūtira, raupapa_tohu, poro_tūtira
+from taumahi import dictionary_check, auaha_kupu_tūtira, raupapa_tohu, poro_tūtira
 import argparse
 
 
@@ -28,7 +28,7 @@ def matua():
     parser.add_argument('--good_output', '-g',
                         help="Output text file where defined Māori word are stored")
     parser.add_argument(
-        '--bad_output', '-b', help="Output text file where defined Māori word are stored")
+        '--bad_output', '-b', help="Output text file where English words of Māori format (i.e. undefined by maoridictionary.co.nz) are stored")
     parser.add_argument(
         '--text', '-t', help="Switch to determine if input text file is a list of words or not (one word per line)", action="store_true")
     parser.add_argument(
