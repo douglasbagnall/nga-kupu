@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+# Checks words that are considered 'māori' against maoridictionary.co.nz to determine whether they are legitimate words
+from taumahi import dictionary_check, auaha_kupu_tūtira, raupapa_tohu, poro_tūtira
+import argparse
+
+
+def tangohia_kupu_tōkau(args):
+    kōnae = open(args.input, 'r')
+    kupu_tōkau = kōnae.read()
+    kōnae.close()
+    return kupu_tōkau
+
+
+def tuhi_puta_tuhinga(args, good_list, bad_list):
+    # writes the list of words to a new document, each word and hyphenated word on a new line
+    kupu_tūtira_hou = open(args.good_output, "w")
+    kupu_tūtira_hou.write("\n".join(good_list))
+    kupu_tūtira_hou.close()
+
+    kupu_tūtira_hou = open(args.bad_output, "w")
+    kupu_tūtira_hou.write("\n".join(bad_list))
+    kupu_tūtira_hou.close()
+
+
+def matua():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', help="Input text file")
+    parser.add_argument('--good_output', '-g',
+                        help="Output text file where defined Māori word are stored")
+    parser.add_argument(
+        '--bad_output', '-b', help="Output text file where English words of Māori format (i.e. undefined by maoridictionary.co.nz) are stored")
+    parser.add_argument(
+        '--text', '-t', help="Switch to determine if input text file is a list of words or not (one word per line)", action="store_true")
+    parser.add_argument(
+        '--prune', '-p', help="Switch to determine whether input text file is multi or monolingual", action="store_true")
+    args = parser.parse_args()
+    kupu_tōkau = tangohia_kupu_tōkau(args)
+
+    if args.text:
+        kupu_tūtira = auaha_kupu_tūtira(kupu_tōkau)
+    else:
+        kupu_tūtira = kupu_tōkau.split("\n")
+
+    if args.prune:
+        kupu_hou = poro_tūtira(kupu_tūtira)
+    else:
+        kupu_hou = kupu_tūtira
+
+    good_list, bad_list = dictionary_check(kupu_hou)
+    tuhi_puta_tuhinga(args, good_list, bad_list)
+
+
+if __name__ == '__main__':
+    matua()
