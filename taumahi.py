@@ -85,7 +85,7 @@ def tatau_tupu(text):
     return len(kupu_hou), len(kupu_tūtira_pīki)
 
 
-def dictionary_check_word(kupu_hou, ignore_tohutō=False):
+def dictionary_check_word(kupu_hou, ignore_tohutō=True):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set ignore_tohutō=False to not ignore macrons when making the match
     # Returns True or False
