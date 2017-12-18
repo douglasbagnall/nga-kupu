@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 
 oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
-pūriki_pākehā = "bcdfgjlqsvxyz'’"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
@@ -15,7 +14,10 @@ arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 def nahanaha(raupapa_māori):
     # Takes a word count dictionary (e.g. output of kōmiri_kupu) and returns the
     # list of Māori words in alphabetical order
-    return sorted(raupapa_māori.keys(), key=lambda kupu: [arapū.index(pūriki) for pūriki in kupu])
+    tūtira = hōputu(raupapa_māori.keys())
+    tūtira = sorted(tūtira, key=lambda kupu: [arapū.index(
+        pūriki) if pūriki in arapū else len(pūriki) + 1 for pūriki in kupu])
+    return hōputu(tūtira, True, False)
 
 
 def hōputu(kupu, tūtira=True, hōputu_takitahi=True):
@@ -63,7 +65,9 @@ def whakatakirua(tauriterite):
 
 
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
-    # Removes words that contain any English characters from the string above
+    # Removes words that contain any English characters from the string above,
+    # returns dictionaries of word counts for three categories of Māori words:
+    # Māori, ambiguous, non-Māori (Pākehā)
     # Set kūare_tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
@@ -99,7 +103,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
-        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā)):
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or (kupu.lower() in kupu_pākehā)):
             kupu = hōputu(kupu, False, False)
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
