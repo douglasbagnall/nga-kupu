@@ -8,31 +8,15 @@ from bs4 import BeautifulSoup
 oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
 pūriki_pākehā = "bcdfgjlqsvxyz'"
-papakupu_kī = "ABCDEFJHIJKLMNOPQRST"
+papakupu_kī = "BCDEFJHIJKLMNOPQRST"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
-arapū = oropuare + orokati
+arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
 
-def raupapa_tohu(kupu_hou):
-    # Creates dictionaries for ordering the Māori alphabet from the vowel and consonant strings
-
-    papakupu_whakamua = {kī: papakupu_kī[wāriutanga - 1]
-                         for wāriutanga, kī in enumerate(arapū, 1)}
-    papakupu_whakamuri = {
-        papakupu_kī[kī - 1]: wāriutanga for kī, wāriutanga in enumerate(arapū, 1)}
-
-    # Sorts into Māori alphabetical order
-    for arapū_pūriki in arapū:
-        kupu_hou = [re.sub(arapū_pūriki, papakupu_whakamua[arapū_pūriki], kupu)
-                    for kupu in kupu_hou]
-
-    kupu_hou.sort()
-
-    for tau in range(len(arapū)):
-        kupu_hou = [re.sub(
-            papakupu_kī[tau], papakupu_whakamuri[papakupu_kī[tau]], kupu) for kupu in kupu_hou]
-
-    return kupu_hou
+def nahanaha(raupapa_māori):
+    # Takes a word count dictionary (e.g. output of kōmiri_kupu) and returns the
+    # list of Māori words in alphabetical order
+    return sorted(raupapa_māori.keys(), key=lambda kupu: [arapū.index(pūriki) for pūriki in kupu])
 
 
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
@@ -56,7 +40,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
     # consonants are easier to deal with in unicode format
     kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
-        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou]
+        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou.lower]
     kupu_pākehā = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
         r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_pākehā]
     kupu_rangirua = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
@@ -73,29 +57,24 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
 
     for kupu in kupu_hou:
         if kupu in kupu_rangirua:
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
         elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā)):
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
             continue
         else:
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu.lower()))
             if kupu not in raupapa_pākehā:
                 raupapa_pākehā[kupu] = 0
             raupapa_pākehā[kupu] += 1
 
     return raupapa_māori, raupapa_rangirua, raupapa_pākehā
-
-
-def tatau_tupu(text):
-    raupapa_māori, raupapa_rangirua, raupapa_pākehā = poro_tūtira(text)
-    return sum(raupapa_māori.values()), sum(raupapa_māori.values()) + sum(raupapa_rangirua.values()) + sum(raupapa_pākehā.values())
 
 
 def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
