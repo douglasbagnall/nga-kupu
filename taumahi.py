@@ -165,16 +165,13 @@ def kupu_ratios(text):
     num_ambiguous = sum(map_ambiguous.values())
     num_other = sum(map_other.values())
 
-    num_unambigous = num_Māori + num_other
     heMāori = 0
 
-    if num_other and num_Māori:
-        heMāori = 100 * num_Māori / (num_unambigous)
-    elif num_Māori:
-        heMāori = 100
-    elif num_other + num_ambiguous <= 10:
+    if num_Māori:
+        heMāori = 100 * num_Māori / (num_Māori + num_other)
+    elif num_other or num_ambiguous <= 10:
         heMāori = 0
-    elif num_ambiguous:
+    else:
         heMāori = 51
 
     save_corpus = heMāori > 50
