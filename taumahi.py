@@ -20,6 +20,7 @@ def raupapa_tohu(kupu_hou):
                          for wāriutanga, kī in enumerate(arapū, 1)}
     papakupu_whakamuri = {
         papakupu_kī[kī - 1]: wāriutanga for kī, wāriutanga in enumerate(arapū, 1)}
+
     # Sorts into Māori alphabetical order
     for arapū_pūriki in arapū:
         kupu_hou = [re.sub(arapū_pūriki, papakupu_whakamua[arapū_pūriki], kupu)
@@ -34,88 +35,102 @@ def raupapa_tohu(kupu_hou):
     return kupu_hou
 
 
-def auaha_kupu_tūtira(kupu_tōkau):
-    # Creates a list of all words in the file string that contain English and/or Māori letters, and one of all hyphenated words
-    # kupu_tūtira = re.findall(r'[a-zāēīōū]+', kupu_tōkau, flags=re.IGNORECASE)
+def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
+    # Removes words that contain any English characters from the string above
+    # Set kūare_tohutō=True to become sensitive to the presence of macrons when making the match
 
-    # Keep English and Māori consistently
-    kupu_pāhekoheko = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
+    # Splits the raw text along characters that a
+    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
-    # Don't uniquify
-    # combines the lists, removes duplicates by transforming into a set and back again
-    # kupu_tūtira_pīki = list(set(kupu_tūtita + kupu_pāhekoheko))
-    return kupu_pāhekoheko
+    # Reads the file lists of English and ambiguous words into list variables
+    kōnae_pākehā, kōnae_rangirua = open("kupu_kino.txt" if kūare_tohutō else "kupu_kino_no_tohutō.txt", "r"), open(
+        "kupu_rangirua.txt" if kūare_tohutō else "kupu_rangirua_no_tohutō.txt", "r")
+    kupu_pākehā, kupu_rangirua = kōnae_pākehā.read(
+    ).split(), kōnae_rangirua.read().split()
+    kōnae_pākehā.close(), kōnae_rangirua.close()
 
+    # Setting up the dictionaries in which the words in the text will be placed
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
 
-def poro_tūtira(kupu_hou, ignore_tohutō=True):
-    # Removes words that contain any English characters from the string above
-    # Set ignore_tohutō=True to become sensitive to the presence of macrons when making the match
-
-    if ignore_tohutō:
-        kōnae = open("kupu_kino.txt", "r")
-        kupu_pākehā = kōnae.read().split()
-        kōnae.close()
-    else:
-        kōnae = open("kupu_kino_no_tohutō.txt", "r")
-        kupu_pākehā = kōnae.read().split()
-        kōnae.close()
-
-    # Replaces 'ng' and 'wh' with 'ŋ' and 'ƒ' respectively, since words with English characters have been removed and it is easier to deal with in unicode format
+    # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
+    # consonants are easier to deal with in unicode format
     kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
         r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou]
+    kupu_pākehā = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
+        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_pākehā]
+    kupu_rangirua = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
+        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_rangirua]
 
-    # Removes words that are English but contain Māori characters (like "the"), words that end in a consonant, words with a 'g' that is not preceeded by an 'n', words that have English characters and words that are in the stoplist of Māori-seeming english words.
-    kupu_hou = [kupu for kupu in kupu_hou if not (re.compile("[{o}][{o}]".format(o=orokati)).search(
-        kupu.lower()) or (kupu[-1].lower() in orokati) or any(
-            pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā))]
+    # Puts each word through tests to determine which word frequency dictionary
+    # it should be referred to. Goes to the ambiguous dictionary if it's in the
+    # ambiguous list, goes to the Māori dictionary if it doesn't have consecutive
+    # consonants, doesn't end in a consnant, doesn't have any english letters
+    # and isn't one of the provided stop words. Otherwise it goes to the non-Māori
+    # dictionary. If this word hasn't been added to the dictionary, it does so,
+    # and adds a count for every time the corresponding word gets passed to the
+    # dictionary.
 
-    # kupu_hou = raupapa_tohu(kupu_hou)
+    for kupu in kupu_hou:
+        if kupu in kupu_rangirua:
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            if kupu not in raupapa_rangirua:
+                raupapa_rangirua[kupu] = 0
+            raupapa_rangirua[kupu] += 1
+            continue
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā)):
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            if kupu not in raupapa_māori:
+                raupapa_māori[kupu] = 0
+            raupapa_māori[kupu] += 1
+            continue
+        else:
+            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu)).lower()
+            if kupu not in raupapa_pākehā:
+                raupapa_pākehā[kupu] = 0
+            raupapa_pākehā[kupu] += 1
 
-    # Returns the letters to traditional format from unicode format
-    kupu_hou = [re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
-                for kupu in kupu_hou]
-
-    return kupu_hou
+    return raupapa_māori, raupapa_rangirua, raupapa_pākehā
 
 
 def tatau_tupu(text):
-    kupu_tūtira_pīki = auaha_kupu_tūtira(text)
-    kupu_hou = poro_tūtira(kupu_tūtira_pīki)
-    return len(kupu_hou), len(kupu_tūtira_pīki)
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = poro_tūtira(text)
+    return sum(raupapa_māori.values()), sum(raupapa_māori.values()) + sum(raupapa_rangirua.values()) + sum(raupapa_pākehā.values())
 
 
-def dictionary_check_word(kupu_hou, ignore_tohutō=True):
+def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
-    # Set ignore_tohutō=False to not ignore macrons when making the match
+    # Set kūare_tohutō=False to not ignore macrons when making the match
     # Returns True or False
 
     kupu = kupu_hou.lower()
-    if ignore_tohutō:
+    if kūare_tohutō:
         kupu = kupu.translate(no_tohutō)
-    search_page = recode_uri(
+    taukaea = recode_uri(
         'http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
-    page = urlopen(search_page)
-    soup = BeautifulSoup(page, 'html.parser', from_encoding='utf8')
+    whārangi_ipurangi = urlopen(taukaea)
+    hupa = BeautifulSoup(whārangi_ipurangi, 'html.parser',
+                         from_encoding='utf8')
 
-    titles = soup.find_all('h2')
-    for title in titles[:-3]:
-        title = title.text.lower()
-        if "found 0 matches" in title:
+    tohu = hupa.find_all('h2')
+    for taitara in tohu[:-3]:
+        taitara = taitara.text.lower()
+        if "found 0 matches" in taitara:
             return False
             break
-        elif kupu in (title.translate(no_tohutō).split() if ignore_tohutō else title.split()):
+        elif kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
             return True
             break
     return False
 
 
-def dictionary_check(kupu_hou):
+def hihira_raupapa(kupu_hou):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
-    # Set ignore_tohutō=False to become sensitive to the presence of macrons when making the match
+    # Set kūare_tohutō=False to become sensitive to the presence of macrons when making the match
 
-    checks = list(map(dictionary_check_word, kupu_hou))
+    hihira = list(map(hihira_raupapa_kupu, kupu_hou))
 
-    good_list = [pair[1] for pair in zip(checks, kupu_hou) if pair[0]]
-    bad_list = [pair[1] for pair in zip(checks, kupu_hou) if not pair[0]]
-    return good_list, bad_list
+    kupu_pai = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if tokorua[0]]
+    kupu_kino = [tokorua[1]
+                 for tokorua in zip(hihira, kupu_hou) if not tokorua[0]]
+    return kupu_pai, kupu_kino
