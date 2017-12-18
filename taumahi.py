@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
 pūriki_pākehā = "bcdfgjlqsvxyz'"
-papakupu_kī = "BCDEFJHIJKLMNOPQRST"
 no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
