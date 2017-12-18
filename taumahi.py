@@ -150,3 +150,29 @@ def hihira_raupapa(kupu_hou):
     kupu_kino = [tokorua[1]
                  for tokorua in zip(hihira, kupu_hou) if not tokorua[0]]
     return kupu_pai, kupu_kino
+
+
+def kupu_ratios(text):
+    map_Māori, map_ambiguous, map_other = auaha_kupu_tūtira(text)
+    # ambiguous map may include words such as:
+    # ['take', 'Take', 'too', 'Too', 'woo', 'hoo', 'No', 'no', 'Ha', 'ha', 'name', 'one', 'where', 'who', 'We', 'we', 'Nowhere', 'nowhere', 'are', 'he', 'hero', 'here', 'none', 'whoa']
+
+    num_Māori = sum(map_Māori.values())
+    num_ambiguous = sum(map_ambiguous.values())
+    num_other = sum(map_other.values())
+
+    num_unambigous = num_Māori + num_other
+    heMāori = 0
+
+    if num_other and num_Māori:
+        heMāori = 100 * num_Māori / (num_unambigous)
+    elif num_Māori:
+        heMāori = 100
+    elif num_other + num_ambiguous <= 10:
+        heMāori = 0
+    elif num_ambiguous:
+        heMāori = 51
+
+    save_corpus = heMāori > 50
+
+    return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
