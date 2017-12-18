@@ -2,7 +2,7 @@
 Identify Māori words in text.
 
 Both scripts have only been tested on python3.
-To install the package, run "python3 setup.py install" from the working directory
+To install the package, run `python3 setup.py install` from the working directory
 
 `kupu_tūtira` takes a multilingual corpus and returns a list of the words that it considers to be Māori, as well as hyphenated words. It is passed two filenames in the terminal, the first file containing the corpus, the second being the output file. It also determines how much of the text is Māori. Use the following format to execute this script.
 
