@@ -18,9 +18,53 @@ def nahanaha(raupapa_māori):
     return sorted(raupapa_māori.keys(), key=lambda kupu: [arapū.index(pūriki) for pūriki in kupu])
 
 
+def hōputu(kupu, tūtira=True, hōputu_takitahi=True):
+    # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
+    # consonants are easier to deal with in unicode format
+    # First Boolean variable determines whether it's been passed a list (set
+    # False if string) so that it can return a list. The second Boolean variable
+    # determines whether it's encoding or decoding (set False if decoding)
+    if tūtira:
+        if hōputu_takitahi:
+            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)', whakatakitahi, whakatomo) for whakatomo in kupu]
+        else:
+            return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu]
+    else:
+        if hōputu_takitahi:
+            return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)', whakatakitahi, kupu)
+        else:
+            return re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, kupu)
+
+
+def whakatakitahi(tauriterite):
+    # If passed the appropriate letters, return the corresponding symbol
+    oro = tauriterite.group(0)
+    if oro == 'ng':
+        return 'ŋ'
+    elif oro == 'w\'' or oro == 'w’' or oro == 'wh':
+        return 'ƒ'
+    elif oro == 'Ng':
+        return 'Ŋ'
+    else:
+        return 'Ƒ'
+
+
+def whakatakirua(tauriterite):
+    # If passed the appropriate symbol, return the corresponding letters
+    oro = tauriterite.group(0)
+    if oro == 'ŋ':
+        return 'ng'
+    elif oro == 'ƒ':
+        return 'wh'
+    elif oro == 'Ŋ':
+        return 'Ng'
+    else:
+        return 'Wh'
+
+
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # Removes words that contain any English characters from the string above
-    # Set kūare_tohutō=True to become sensitive to the presence of macrons when making the match
+    # Set kūare_tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
@@ -29,21 +73,15 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # Reads the file lists of English and ambiguous words into list variables
     kōnae_pākehā, kōnae_rangirua = open("kupu_kino.txt" if kūare_tohutō else "kupu_kino_no_tohutō.txt", "r"), open(
         "kupu_rangirua.txt" if kūare_tohutō else "kupu_rangirua_no_tohutō.txt", "r")
-    kupu_pākehā, kupu_rangirua = kōnae_pākehā.read(
-    ).split(), kōnae_rangirua.read().split()
+    kupu_pākehā = kōnae_pākehā.read().split()
+    kupu_rangirua = kōnae_rangirua.read().split()
     kōnae_pākehā.close(), kōnae_rangirua.close()
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
 
-    # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
-    # consonants are easier to deal with in unicode format
-    kupu_hou = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
-        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_hou.lower]
-    kupu_pākehā = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
-        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_pākehā]
-    kupu_rangirua = [re.sub(r'w\'', 'ƒ', re.sub(r'w’', 'ƒ', re.sub(
-        r'ng', 'ŋ', re.sub(r'wh', 'ƒ', kupu)))) for kupu in kupu_rangirua]
+    kupu_hou, kupu_pākehā, kupu_rangirua = hōputu(
+        kupu_hou), hōputu(kupu_pākehā), hōputu(kupu_rangirua)
 
     # Puts each word through tests to determine which word frequency dictionary
     # it should be referred to. Goes to the ambiguous dictionary if it's in the
@@ -55,20 +93,20 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # dictionary.
 
     for kupu in kupu_hou:
-        if kupu in kupu_rangirua:
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
+        if kupu.lower() in kupu_rangirua:
+            kupu = hōputu(kupu, False, False)
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
         elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki in kupu.lower() for pūriki in pūriki_pākehā) or (kupu.lower() in kupu_pākehā)):
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu))
+            kupu = hōputu(kupu, False, False)
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
             continue
         else:
-            kupu = re.sub(r'ŋ', 'ng', re.sub(r'ƒ', 'wh', kupu.lower()))
+            kupu = hōputu(kupu, False, False)
             if kupu not in raupapa_pākehā:
                 raupapa_pākehā[kupu] = 0
             raupapa_pākehā[kupu] += 1
@@ -78,7 +116,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
 
 def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
-    # Set kūare_tohutō=False to not ignore macrons when making the match
+    # Set kūare_tohutō = False to not ignore macrons when making the match
     # Returns True or False
 
     kupu = kupu_hou.lower()
@@ -104,7 +142,7 @@ def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
 
 def hihira_raupapa(kupu_hou):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
-    # Set kūare_tohutō=False to become sensitive to the presence of macrons when making the match
+    # Set kūare_tohutō = False to become sensitive to the presence of macrons when making the match
 
     hihira = list(map(hihira_raupapa_kupu, kupu_hou))
 
