@@ -28,12 +28,12 @@ def hōputu(kupu, tūtira=True, hōputu_takitahi=True):
     # determines whether it's encoding or decoding (set False if decoding)
     if tūtira:
         if hōputu_takitahi:
-            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)', whakatakitahi, whakatomo) for whakatomo in kupu]
+            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu]
         else:
             return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu]
     else:
         if hōputu_takitahi:
-            return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)', whakatakitahi, kupu)
+            return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
         else:
             return re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, kupu)
 
@@ -45,7 +45,7 @@ def whakatakitahi(tauriterite):
         return 'ŋ'
     elif oro == 'w\'' or oro == 'w’' or oro == 'wh':
         return 'ƒ'
-    elif oro == 'Ng':
+    elif oro == 'Ng' or oro == 'NG':
         return 'Ŋ'
     else:
         return 'Ƒ'

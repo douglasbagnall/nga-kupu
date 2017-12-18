@@ -1,8 +1,8 @@
 # nga-kupu
-Identify Māori words in text - still a work in progress
-Some of these files are for the `nga-tautohetohe` project
+Identify Māori words in text.
 
 Both scripts have only been tested on python3.
+To install the package, run "python3 setup.py install" from the working directory
 
 `kupu_tūtira` takes a multilingual corpus and returns a list of the words that it considers to be Māori, as well as hyphenated words. It is passed two filenames in the terminal, the first file containing the corpus, the second being the output file. It also determines how much of the text is Māori. Use the following format to execute this script.
 
@@ -13,7 +13,3 @@ Both scripts have only been tested on python3.
 `python3 dictionarycheck.py -i input_file.txt -g output_file1.txt -b output_file2.txt`
 
 `englishwords.txt` is a text file that will soon be incorporated into `kupu_tūtira.py` in order to better scrutinise Māori words. It has been passed through `kupu_tūtira.py` and `dictionarycheck.py` and is the list of Māori form undefined words from a corpus of approximately 15 million English words.
-
-# Next steps:
-- incorporating the list of exceptions into `kupu_tūtira.py`
-- making the percentage of Māori words function of `kupu_tūtira.py` into its own script

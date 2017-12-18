@@ -50,9 +50,11 @@ def test_whakatakitahi_tūtira():
 
 def test_whakatakitahi_kupu():
     assert taumahi.hōputu('ngawha', False, True) == 'ŋaƒa' and taumahi.hōputu(
-        'Wha', False, True) == 'Ƒa' and taumahi.hōputu('Nga', False, True) == 'Ŋa'
+        'Wha', False, True) == 'Ƒa' and taumahi.hōputu('Nga', False, True) == 'Ŋa' and taumahi.hōputu(
+            'WHA', False, True) == 'ƑA' and taumahi.hōputu('NGA', False, True) == 'ŊA'
 
 
 def test_whakatakitahi_tūtira():
     assert taumahi.hōputu('ŋaƒa', False, False) == 'ngawha' and taumahi.hōputu(
-        'Ƒa', False, False) == 'Wha' and taumahi.hōputu('Ŋa', False, False) == 'Nga'
+        'Ƒa', False, False) == 'Wha' and taumahi.hōputu('Ŋa', False, False) == 'Nga' and taumahi.hōputu(
+            'ƑA', False, False) == 'WhA' and taumahi.hōputu('ŊA', False, False) == 'NgA'
