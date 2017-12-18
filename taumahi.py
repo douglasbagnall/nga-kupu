@@ -153,7 +153,7 @@ def hihira_raupapa(kupu_hou):
 
 
 def kupu_ratios(text):
-    map_Māori, map_ambiguous, map_other = auaha_kupu_tūtira(text)
+    map_Māori, map_ambiguous, map_other = kōmiri_kupu(text)
     # ambiguous map may include words such as:
     # ['take', 'Take', 'too', 'Too', 'woo', 'hoo', 'No', 'no', 'Ha', 'ha', 'name', 'one', 'where', 'who', 'We', 'we', 'Nowhere', 'nowhere', 'are', 'he', 'hero', 'here', 'none', 'whoa']
 
