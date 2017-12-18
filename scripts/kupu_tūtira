@@ -6,9 +6,11 @@ import re
 import sys
 import argparse
 
-from taumahi import kōmiri_kupu
+from taumahi import kōmiri_kupu, nahanaha
 
 # Returns the plain text from the input file in one string
+
+
 def tangohia_kupu_tōkau(kōwhiri):
     kōnae = open(kōwhiri.input, 'r')
     kupu_tōkau = kōnae.read()
@@ -41,8 +43,10 @@ def matua():
 
     # Writes these words that are considered to be Māori in the text (the keys
     # of the first object returned by the kōmiri_kupu function) to their output
-    # files or prints them to the console depending on user input
-    tuhi_puta_tuhinga(kōwhiri, list(kōmiri_kupu(kupu_tōkau)[0].keys()))
+    # files or prints them to the console depending on user input, in Māori
+    # alphabetical order
+
+    tuhi_puta_tuhinga(kōwhiri, nahanaha(kōmiri_kupu(kupu_tōkau)[0]))
 
 
 if __name__ == '__main__':
