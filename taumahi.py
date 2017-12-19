@@ -130,7 +130,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     return raupapa_māori, raupapa_rangirua, raupapa_pākehā
 
 
-def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
+def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=False):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set kūare_tohutō = False to not ignore macrons when making the match
     # Returns True or False
