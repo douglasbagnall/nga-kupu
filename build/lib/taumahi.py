@@ -87,8 +87,8 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
         sys.exit()
 
     # Reads the file lists of English and ambiguous words into list variables
-    kōnae_pākehā, kōnae_rangirua = open(dirpath + "/kupu_kino.txt" if kūare_tohutō else dirpath + "/kupu_kino_no_tohutō.txt", "r"), open(
-        dirpath + "/kupu_rangirua.txt" if kūare_tohutō else dirpath + "/kupu_rangirua_no_tohutō.txt", "r")
+    kōnae_pākehā, kōnae_rangirua = open(dirpath + "/kupu_kino.txt" if kūare_tohutō else dirpath + "/kupu_kino_kūare_tohutō.txt", "r"), open(
+        dirpath + "/kupu_rangirua.txt" if kūare_tohutō else dirpath + "/kupu_rangirua_kūare_tohutō.txt", "r")
     kupu_pākehā = kōnae_pākehā.read().split()
     kupu_rangirua = kōnae_rangirua.read().split()
     kōnae_pākehā.close(), kōnae_rangirua.close()
