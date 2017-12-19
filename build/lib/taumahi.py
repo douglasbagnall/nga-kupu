@@ -15,23 +15,27 @@ arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 def nahanaha(raupapa_māori):
     # Takes a word count dictionary (e.g. output of kōmiri_kupu) and returns the
     # list of Māori words in alphabetical order
-    tūtira = hōputu(raupapa_māori.keys())
+    tūtira = hōputu(raupapa_māori)
     tūtira = sorted(tūtira, key=lambda kupu: [arapū.index(
         pūriki) if pūriki in arapū else len(pūriki) + 1 for pūriki in kupu])
-    return hōputu(tūtira, True, False)
+    return hōputu(tūtira, False)
 
 
-def hōputu(kupu, tūtira=True, hōputu_takitahi=True):
+def hōputu(kupu, hōputu_takitahi=True):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
     # consonants are easier to deal with in unicode format
-    # First Boolean variable determines whether it's been passed a list (set
-    # False if string) so that it can return a list. The second Boolean variable
-    # determines whether it's encoding or decoding (set False if decoding)
-    if tūtira:
+    # The Boolean variable determines whether it's encoding or decoding
+    # (set False if decoding)
+    if isinstance(kupu, list):
         if hōputu_takitahi:
             return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu]
         else:
             return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu]
+    elif isinstance(kupu, dict):
+        if hōputu_takitahi:
+            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu.keys()]
+        else:
+            return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu.keys()]
     else:
         if hōputu_takitahi:
             return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
@@ -80,7 +84,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
         root = __file__
         if os.path.islink(root):
             root = os.path.realpath(root)
-        dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi'
+        dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
     except:
         print("I'm sorry, but something is wrong.")
         print("There is no __file__ variable. Please contact the author.")
@@ -110,19 +114,19 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
 
     for kupu in kupu_hou:
         if kupu.lower() in kupu_rangirua:
-            kupu = hōputu(kupu, False, False)
+            kupu = hōputu(kupu, False)
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
         elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or (kupu.lower() in kupu_pākehā)):
-            kupu = hōputu(kupu, False, False)
+            kupu = hōputu(kupu, False)
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
             continue
         else:
-            kupu = hōputu(kupu, False, False)
+            kupu = hōputu(kupu, False)
             if kupu not in raupapa_pākehā:
                 raupapa_pākehā[kupu] = 0
             raupapa_pākehā[kupu] += 1
@@ -130,7 +134,7 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     return raupapa_māori, raupapa_rangirua, raupapa_pākehā
 
 
-def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
+def hihira_raupapa_kupu(kupu_hou, kūare_tohutō):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set kūare_tohutō = False to not ignore macrons when making the match
     # Returns True or False
@@ -156,11 +160,11 @@ def hihira_raupapa_kupu(kupu_hou, kūare_tohutō=True):
     return False
 
 
-def hihira_raupapa(kupu_hou):
+def hihira_raupapa(kupu_hou, kūare_tohutō=False):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
     # Set kūare_tohutō = False to become sensitive to the presence of macrons when making the match
 
-    hihira = list(map(hihira_raupapa_kupu, kupu_hou))
+    hihira = [hihira_raupapa_kupu(kupu, kūare_tohutō) for kupu in kupu_hou]
 
     kupu_pai = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if tokorua[0]]
     kupu_kino = [tokorua[1]
@@ -189,3 +193,41 @@ def kupu_ratios(text):
     save_corpus = heMāori > 50
 
     return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
+
+
+def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
+    # Removes words that contain any English characters from the string above,
+    # returns dictionaries of word counts for three categories of Māori words:
+    # Māori, ambiguous, non-Māori (Pākehā)
+    # Set kūare_tohutō = True to become sensitive to the presence of macrons when making the match
+
+    # Splits the raw text along characters that a
+    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
+        p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
+
+    # Setting up the dictionaries in which the words in the text will be placed
+    raupapa_māori, raupapa_pākehā = {}, {}
+
+    kupu_hou = hōputu(kupu_hou)
+
+    # Puts each word through tests to determine which word frequency dictionary
+    # it should be referred to. Goes to the Māori dictionary if it doesn't have
+    # consecutive consonants, doesn't end in a consnant, or doesn't have any
+    # English letters. Otherwise it goes to the non-Māori dictionary. If this
+    # word hasn't been added to the dictionary, it does so, and adds a count for
+    # every time the corresponding word gets passed to the dictionary.
+
+    for kupu in kupu_hou:
+        if not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower())):
+            kupu = hōputu(kupu, False)
+            if kupu not in raupapa_māori:
+                raupapa_māori[kupu] = 0
+            raupapa_māori[kupu] += 1
+            continue
+        else:
+            kupu = hōputu(kupu, False)
+            if kupu not in raupapa_pākehā:
+                raupapa_pākehā[kupu] = 0
+            raupapa_pākehā[kupu] += 1
+
+    return raupapa_māori, raupapa_pākehā

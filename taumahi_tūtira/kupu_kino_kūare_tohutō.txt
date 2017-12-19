@@ -4,6 +4,7 @@ aero
 aura
 aurora
 automate
+amature
 ami
 amino
 anemia
@@ -18,6 +19,7 @@ aroma
 atari
 awake
 aware
+angie
 eau
 ee
 ei
@@ -29,28 +31,35 @@ eureka
 euro
 europa
 europe
+emo
 emu
 erie
 eta
+engine
 ie
 ieee
 ii
 iii
 iowa
 iu
+imo
 initiate
 ipo
 ire
 irene
+itu
 oa
 oahu
 oe
 oo
+ooo
 ou
 ohio
+oki
 omaha
 opera
 operate
+orange
 owe
 uae
 uu
@@ -71,6 +80,7 @@ hero
 hike
 hipaa
 hire
+hinge
 home
 homo
 howe
@@ -81,6 +91,7 @@ karaoke
 karate
 kate
 katie
+kangaroo
 keno
 maine
 mauritania
@@ -113,6 +124,7 @@ moto
 murakami
 mute
 naomi
+nauru
 name
 nano
 napa
@@ -125,6 +137,7 @@ nemo
 nero
 ni
 nie
+niue
 nike
 nina
 nine
@@ -136,6 +149,7 @@ nominee
 nope
 nora
 note
+nowhere
 nuke
 panama
 panorama
@@ -156,6 +170,8 @@ potato
 puma
 rao
 ratio
+range
+reiki
 remake
 remote
 rename
@@ -191,6 +207,7 @@ too
 tome
 toni
 topeka
+tongue
 tue
 tune
 wee
@@ -204,3 +221,6 @@ woo
 woke
 wore
 wu
+white
+who
+whore
