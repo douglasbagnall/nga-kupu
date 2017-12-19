@@ -3,19 +3,19 @@ import taumahi
 
 
 def test_māori_word():
-    assert taumahi.hihira_raupapa_kupu('kupu')
+    assert taumahi.hihira_raupapa_kupu('kupu', True)
 
 
 def test_māori_uppercase():
-    assert taumahi.hihira_raupapa_kupu('KUPU')
+    assert taumahi.hihira_raupapa_kupu('KUPU', True)
 
 
 def test_english_word():
-    assert not taumahi.hihira_raupapa_kupu('mittens')
+    assert not taumahi.hihira_raupapa_kupu('mittens', True)
 
 
 def test_tohutō():
-    assert taumahi.hihira_raupapa_kupu('rōpū')
+    assert taumahi.hihira_raupapa_kupu('rōpū', True)
 
 
 def test_ignore_tohutō():
@@ -27,11 +27,11 @@ def test_check_list():
 
 
 def test_waitangi():
-    assert taumahi.hihira_raupapa_kupu('Waitangi')
+    assert taumahi.hihira_raupapa_kupu('Waitangi', True)
 
 
 def test_space():
-    assert not taumahi.hihira_raupapa_kupu(' Pōneke')
+    assert not taumahi.hihira_raupapa_kupu(' Pōneke', True)
 
 
 def test_hihira_raupapa_kupu():
@@ -39,22 +39,20 @@ def test_hihira_raupapa_kupu():
 
 
 def test_whakatakitahi_tūtira():
-    assert taumahi.hōputu(['ngawha', 'Wha', 'Nga'], True, True) == [
+    assert taumahi.hōputu(['ngawha', 'Wha', 'Nga'], True) == [
         'ŋaƒa', 'Ƒa', 'Ŋa']
 
 
-def test_whakatakitahi_tūtira():
-    assert taumahi.hōputu(['ŋaƒa', 'Ƒa', 'Ŋa'], True, False) == [
+def test_whakatakirua_tūtira():
+    assert taumahi.hōputu(['ŋaƒa', 'Ƒa', 'Ŋa'], False) == [
         'ngawha', 'Wha', 'Nga']
 
 
-def test_whakatakitahi_kupu():
-    assert taumahi.hōputu('ngawha', False, True) == 'ŋaƒa' and taumahi.hōputu(
-        'Wha', False, True) == 'Ƒa' and taumahi.hōputu('Nga', False, True) == 'Ŋa' and taumahi.hōputu(
-            'WHA', False, True) == 'ƑA' and taumahi.hōputu('NGA', False, True) == 'ŊA'
+def test_whakatakitahi():
+    assert taumahi.hōputu('ngawha', True) == 'ŋaƒa' and taumahi.hōputu('Wha', True) == 'Ƒa' and taumahi.hōputu(
+        'Nga', True) == 'Ŋa' and taumahi.hōputu('WHA', True) == 'ƑA' and taumahi.hōputu('NGA', True) == 'ŊA'
 
 
-def test_whakatakitahi_tūtira():
-    assert taumahi.hōputu('ŋaƒa', False, False) == 'ngawha' and taumahi.hōputu(
-        'Ƒa', False, False) == 'Wha' and taumahi.hōputu('Ŋa', False, False) == 'Nga' and taumahi.hōputu(
-            'ƑA', False, False) == 'WhA' and taumahi.hōputu('ŊA', False, False) == 'NgA'
+def test_whakatakirua():
+    assert taumahi.hōputu('ŋaƒa', False) == 'ngawha' and taumahi.hōputu('Ƒa', False) == 'Wha' and taumahi.hōputu(
+        'Ŋa', False) == 'Nga' and taumahi.hōputu('ƑA', False) == 'WhA' and taumahi.hōputu('ŊA', False) == 'NgA'
