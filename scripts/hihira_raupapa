@@ -7,7 +7,7 @@ import argparse
 
 def tangohia_kupu_tōkau(kōwhiri):
     kōnae = open(kōwhiri.input, 'r')
-    kupu_tōkau = kōnae.read()
+    kupu_tōkau = kōnae.read().split()
     kōnae.close()
     return kupu_tōkau
 
@@ -34,7 +34,7 @@ def matua():
     whakatukai = argparse.ArgumentParser()
     whakatukai.add_argument('--input', '-i', help="Input text file")
     whakatukai.add_argument('--good_output', '-g',
-                        help="Output text file where defined Māori word are stored")
+                            help="Output text file where defined Māori word are stored")
     whakatukai.add_argument(
         '--bad_output', '-b', help="Output text file where English words of Māori format (i.e. undefined by maoridictionary.co.nz) are stored")
     whakatukai.add_argument(
@@ -42,11 +42,7 @@ def matua():
     kōwhiri = whakatukai.parse_args()
 
     # Gather text from file
-    kupu_tōkau = tangohia_kupu_tōkau(kōwhiri)
-
-    # Return the words that are considered to be Māori from the Māori frequency
-    # dictionary as returned from the kōmiri_kupu function
-    kupu_hou = list(kōmiri_kupu(kupu_tōkau)[0].keys())
+    kupu_hou = tangohia_kupu_tōkau(kōwhiri)
 
     # Checks these words against the dictionary, returns a list of words that
     # are defined by the dictionary, and a list of words that aren't

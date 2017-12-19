@@ -1,5 +1,4 @@
 import re
-import os
 import sys
 import argparse
 from yelp_uri.encoding import recode_uri
@@ -75,20 +74,9 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
-    rootpath = ''
-    try:
-        root = __file__
-        if os.path.islink(root):
-            root = os.path.realpath(root)
-        dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi'
-    except:
-        print("I'm sorry, but something is wrong.")
-        print("There is no __file__ variable. Please contact the author.")
-        sys.exit()
-
     # Reads the file lists of English and ambiguous words into list variables
-    kōnae_pākehā, kōnae_rangirua = open(dirpath + "/kupu_kino.txt" if kūare_tohutō else dirpath + "/kupu_kino_kūare_tohutō.txt", "r"), open(
-        dirpath + "/kupu_rangirua.txt" if kūare_tohutō else dirpath + "/kupu_rangirua_kūare_tohutō.txt", "r")
+    kōnae_pākehā, kōnae_rangirua = open("kupu_kino.txt" if kūare_tohutō else "kupu_kino_no_tohutō.txt", "r"), open(
+        "kupu_rangirua.txt" if kūare_tohutō else "kupu_rangirua_no_tohutō.txt", "r")
     kupu_pākehā = kōnae_pākehā.read().split()
     kupu_rangirua = kōnae_rangirua.read().split()
     kōnae_pākehā.close(), kōnae_rangirua.close()
