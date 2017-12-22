@@ -14,8 +14,8 @@ pae_tukutuku = 'http://www.nzdl.org'
 pae_tukutuku_haurua = '{}{}'.format(
     pae_tukutuku, '/gsdlmod?gg=text&e=p-00000-00---off-0niupepa--00-0----0-10-0---0---0direct-10---4-------0-1l--11-en-50---20-about---00-0-1-00-0-0-11-1-0utfZz-8-00-0-0-11-10-0utfZz-8-00&a=d&c=niupepa&cl=CL1')
 
-niupepa_kōnae_ingoa = 'test.csv'
-perehitanga_kōnae_ingoa = 'test2.csv'
+niupepa_kōnae_ingoa = 'niupepa_kuputohu.csv'
+perehitanga_kōnae_ingoa = 'perehitanga_kuputohu.csv'
 
 
 def hihira_kuputohu_kōnae():
@@ -55,40 +55,66 @@ def hihira_kuputohu_kōnae():
 def tuhi_kupu_tōkau_kuputohu():
     # Writes raw text to a csv from the urls of newspaper issues
     with open(niupepa_kōnae_ingoa, 'r') as niupepa_kōnae, open(perehitanga_kōnae_ingoa, 'w') as perehitanga_kōnae:
-        taukaea_kaituhi = csv.writer(perehitanga_kōnae)
+        perehitanga_kuputohu = csv.writer(perehitanga_kōnae)
         tuhinga = read_csv(niupepa_kōnae)
         niupepa_kōnae.close()
-        # niupepa_ingoa_tūtira = tuhinga.newspapers
-        # perehitanga_taukaea_tūtira = tuhinga.links
-        for index, row in tuhinga.iterrows():
-            print(list(row))
-        csv.writer(perehitanga_kōnae).writerow(
+
+        perehitanga_kuputohu.writerow(
             ['newspaper', 'issue', 'date_retrieved', 'percent māori', 'raw_text'])
 
-        # for pae in zip(perehitanga_taukaea_tūtira, niupepa_ingoa_tūtira):
-        #     perehitanga_tūtira = eval(pae[0])
-        #     ingoa = pae[1]
-        #     for takirua in perehitanga_tūtira:
-        #         print("\nExtracting text from " + takirua[0] + " in " + ingoa)
-        #         hupa = bs(urlopen(takirua[1]), 'html.parser')
-        #         kupu_tōkau = hupa.select('div.documenttext')[0].find('td')
-        #         if kupu_tōkau != None:
-        #             if kupu_tōkau.text:
-        #                 kupu = kupu_tōkau.text
-        #                 print("Successfully extracted text from " +
-        #                       takirua[0] + " in " + ingoa)
-        #             else:
-        #                 kupu = ''
-        #                 print("Failed to extract text from " +
-        #                       takirua[0] + " in " + ingoa)
-        #         else:
-        #             kupu = ''
-        #             print("Failed to extract text from " +
-        #                   takirua[0] + " in " + ingoa)
-        #
-        #         taukaea_kaituhi.writerow(
-        #             [ingoa, takirua[0], datetime.now(), kupu])
+        for kuputohu, tōtoru in tuhinga.iterrows():
+            kupu = tiki_kupu_tōkau(tōtoru)
+            kōwai = re.findall(r'[^\n]+', kupu)
+            for kōwae in kōwai:
+                if kōwae.strip() != '':
+                    ōrau = tiki_ōrau(kōwae)
+                    perehitanga_kuputohu.writerow(
+                        [tōtoru[0], tōtoru[1], datetime.now(), ōrau, kōwae])
+                else:
+                    continue
+
         perehitanga_kōnae.close()
+    return
+
+
+def tiki_hupa_tūtia(tōtoru):
+    # This function checks to see if there are any links to following pages and
+    # returns a list of tuples containing the page number and the html of each
+    # of these pages
+    print("\nCollecting pages of " + tōtoru[1] + " in " + tōtoru[0])
+    hupa_tūtira = [(1, bs(urlopen(tōtoru[2]), 'html.parser'))]
+
+    while True:
+        taukaea_pinetohu = hupa_tūtira[-1][1].select('div.navarrowsbottom')[
+            0].find('td', align='right', valign='top')
+        if taukaea_pinetohu.a == None:
+            return hupa_tūtira
+        elif taukaea_pinetohu.a['href']:
+            hupa_tūtira += [(taukaea_pinetohu.text.strip(), bs(
+                urlopen(pae_tukutuku + taukaea_pinetohu.a['href']), 'html.parser'))]
+        else:
+            print("\nError collecting all pages\n")
+            return hupa_tūtira
+
+
+def tiki_kupu_tōkau(tōtoru):
+    hupa_tūtira = tiki_hupa_tūtia(tōtoru)
+    print("Extracting text from " + tōtoru[1] + " in " + tōtoru[0])
+    kupu = ''
+    for hupa in hupa_tūtira:
+        kupu_tōkau = hupa[1].select('div.documenttext')[0].find('td')
+        if kupu_tōkau != None:
+            if kupu_tōkau.text:
+                kupu += "\n\n" + kupu_tōkau.text
+            else:
+                print("Failed to extract text from page " + str(hupa[0]) + " of " +
+                      tōtoru[1] + " in " + tōtoru[0])
+        else:
+            print("Failed to extract text from page " + str(hupa[0]) + " of " +
+                  tōtoru[1] + " in " + tōtoru[0])
+
+    print("\nFinished with " + tōtoru[1] + " in " + tōtoru[0])
+    return kupu
 
 
 def tiki_niupepa_taukaea():
@@ -105,7 +131,7 @@ def tiki_niupepa_taukaea():
             taukaea_niupepa_tūtira += [pae_tukutuku + td.a['href']]
         elif td.text:
             tohu = td.text.strip()
-            tohu = tohu[:tohu.index('1') - 1]
+            tohu = tohu[:tohu.index('(') - 1]
             niupepa_ingoa_tūtira += [tohu]
             print("Collected " + tohu)
         else:
@@ -138,6 +164,21 @@ def tiki_perehitanga_taukaea(niupepa_taukaea):
         print("\nDid not collect all issues of " + niupepa_taukaea[0] + "\n")
 
     return perehitanga_ingoa_tūtira, taukaea_perehitanga_tūtira
+
+
+def tiki_ōrau(kōwae):
+    # Uses the kōmiri_kupu function from the taumahi module to estimate how
+    # much of the text is Māori
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = kōmiri_kupu(kōwae)
+
+    tatau_māori = sum(raupapa_māori.values())
+    tatau_pākehā = sum(raupapa_pākehā.values())
+    tatau_tapeke = tatau_māori + tatau_pākehā
+
+    if tatau_tapeke != 0:
+        return "{:0.2f}%".format((tatau_māori / tatau_tapeke) * 100)
+    else:
+        return "0.00%"
 
 
 def matua():

@@ -17,3 +17,10 @@ To install the package, run `python3 setup.py install` from the working director
 `python3 hihira_raupapa -i input_file.txt -g output_file1.txt -b output_file2.txt`
 
 `englishwords.txt` is a text file that will soon be incorporated into `kupu_tūtira.py` in order to better scrutinise Māori words. It has been passed through `kupu_tūtira.py` and `dictionarycheck.py` and is the list of Māori form undefined words from a corpus of approximately 15 million English words.
+
+# hiki_niupepa_kōwae to-do List
+
+- Edit the script so that it can continue from where it left off if the process gets interrupted
+- Maybe print out text that is being written in the terminal
+- Maybe include the page number with the paragraph that is being written, which will require a rework of tiki_kupu_tōkau()
+- Include how long the job took
