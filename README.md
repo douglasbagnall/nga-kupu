@@ -23,4 +23,5 @@ To install the package, run `python3 setup.py install` from the working director
 - Edit the script so that it can continue from where it left off if the process gets interrupted
 - Maybe print out text that is being written in the terminal
 - Maybe include the page number with the paragraph that is being written, which will require a rework of tiki_kupu_tōkau()
-- Include how long the job took
+- Include how long the job took in terminal output
+- Find a better way to divide between paragraphs
