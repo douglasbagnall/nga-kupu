@@ -231,3 +231,12 @@ def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
             raupapa_pākehā[kupu] += 1
 
     return raupapa_māori, raupapa_pākehā
+
+
+def tiro_kupu_kātū(kupu_tōkau):
+    # A way to check which words are being evaluated as Māori, ambiguous or pākehā by printing them out in lists
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = kōmiri_kupu(
+        kupu_tōkau, False)
+    print("\n--- Māori words ---\n", list(raupapa_māori), "\n")
+    print("\n--- Ambiguous words ---\n", list(raupapa_rangirua), "\n")
+    print("\n--- English words ---\n", list(raupapa_pākehā), "\n")

@@ -60,24 +60,22 @@ def tuhi_kupu_tōkau_kuputohu():
         niupepa_kōnae.close()
 
         perehitanga_kuputohu.writerow(
-            ['newspaper', 'issue', 'date_retrieved', 'percent māori', 'raw_text'])
+            ['date_retrieved', 'newspaper', 'issue', 'page', 'percent_māori', 'raw_text'])
 
         for kuputohu, tōtoru in tuhinga.iterrows():
-            kupu = tiki_kupu_tōkau(tōtoru)
-            kōwai = re.findall(r'[^\n]+', kupu)
-            for kōwae in kōwai:
-                if kōwae.strip() != '':
-                    ōrau = tiki_ōrau(kōwae)
-                    perehitanga_kuputohu.writerow(
-                        [tōtoru[0], tōtoru[1], datetime.now(), ōrau, kōwae])
-                else:
-                    continue
+            whārangi_tūtira = tiki_kupu_tōkau(tōtoru)
+            for taurua in whārangi_tūtira:
+                kupu_tōkau = re.sub(r'[ ]{2,}', r' ', re.sub(
+                    r'[\n]{2,}', '\n', taurua[1].strip()))
+                ōrau = tiki_ōrau(kupu_tōkau)
+                perehitanga_kuputohu.writerow(
+                    [datetime.now(), tōtoru[0], tōtoru[1], taurua[0], ōrau, kupu_tōkau])
 
         perehitanga_kōnae.close()
     return
 
 
-def tiki_hupa_tūtia(tōtoru):
+def tiki_hupa_tūtira(tōtoru):
     # This function checks to see if there are any links to following pages and
     # returns a list of tuples containing the page number and the html of each
     # of these pages
@@ -98,14 +96,14 @@ def tiki_hupa_tūtia(tōtoru):
 
 
 def tiki_kupu_tōkau(tōtoru):
-    hupa_tūtira = tiki_hupa_tūtia(tōtoru)
+    hupa_tūtira = tiki_hupa_tūtira(tōtoru)
     print("Extracting text from " + tōtoru[1] + " in " + tōtoru[0])
-    kupu = ''
+    whārangi_kupu = []
     for hupa in hupa_tūtira:
         kupu_tōkau = hupa[1].select('div.documenttext')[0].find('td')
         if kupu_tōkau != None:
             if kupu_tōkau.text:
-                kupu += "\n\n" + kupu_tōkau.text
+                whārangi_kupu += [(str(hupa[0]), kupu_tōkau.text)]
             else:
                 print("Failed to extract text from page " + str(hupa[0]) + " of " +
                       tōtoru[1] + " in " + tōtoru[0])
@@ -114,7 +112,7 @@ def tiki_kupu_tōkau(tōtoru):
                   tōtoru[1] + " in " + tōtoru[0])
 
     print("\nFinished with " + tōtoru[1] + " in " + tōtoru[0])
-    return kupu
+    return whārangi_kupu
 
 
 def tiki_niupepa_taukaea():

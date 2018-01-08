@@ -21,7 +21,8 @@ To install the package, run `python3 setup.py install` from the working director
 # hiki_niupepa_kōwae to-do List
 
 - Edit the script so that it can continue from where it left off if the process gets interrupted
-- Maybe print out text that is being written in the terminal
 - Maybe include the page number with the paragraph that is being written, which will require a rework of tiki_kupu_tōkau()
 - Include how long the job took in terminal output
 - Find a better way to divide between paragraphs
+- Fix the script so the first page isn't always labelled number 1
+- Split up text entries that are evaluated as being under a certain percentage of Māori (like 95%) and evaluate them by paragraph
