@@ -181,18 +181,19 @@ def kupu_ratios(text):
     num_ambiguous = sum(map_ambiguous.values())
     num_other = sum(map_other.values())
 
-    heMāori = 0
-
-    if num_Māori:
-        heMāori = 100 * num_Māori / (num_Māori + num_other)
-    elif num_other or num_ambiguous <= 10:
-        heMāori = 0
-    else:
-        heMāori = 51
-
+    heMāori = get_percentage(num_Māori, num_ambiguous, num_other)
     save_corpus = heMāori > 50
 
     return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
+
+
+def get_percentage(num_Māori, num_ambiguous, num_other):
+    if num_Māori:
+        return 100 * num_Māori / (num_Māori + num_other)
+    elif num_other or num_ambiguous <= 10:
+        return 0
+    else:
+        return 51
 
 
 def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
