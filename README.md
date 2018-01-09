@@ -18,11 +18,9 @@ To install the package, run `python3 setup.py install` from the working director
 
 `englishwords.txt` is a text file that will soon be incorporated into `kupu_tūtira.py` in order to better scrutinise Māori words. It has been passed through `kupu_tūtira.py` and `dictionarycheck.py` and is the list of Māori form undefined words from a corpus of approximately 15 million English words.
 
-# hiki_niupepa_kōwae to-do List
+# hiki_niupepa_kōwae To-Do List
 
-- Edit the script so that it can continue from where it left off if the process gets interrupted
-- Maybe include the page number with the paragraph that is being written, which will require a rework of tiki_kupu_tōkau()
-- Include how long the job took in terminal output
-- Find a better way to divide between paragraphs
-- Fix the script so the first page isn't always labelled number 1
+- Edit the script so that if a url was not written in the previous entry, it can rewrite the previous entry still. (Could be done by always getting the second to last url rather than the last url)
+- Change tuhi_kupu_tōkau_kuputohu's name since rāringa_kaituhituhi now does the writing
+- Fix the printouts so that it doesn't say it's fetching pages that aren't being written?
 - Split up text entries that are evaluated as being under a certain percentage of Māori (like 95%) and evaluate them by paragraph
