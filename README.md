@@ -20,7 +20,7 @@ To install the package, run `python3 setup.py install` from the working director
 
 # hiki_niupepa_kōwae To-Do List
 
-- Edit the script so that if a url was not written in the previous entry, it can rewrite the previous entry still. (Could be done by always getting the second to last url rather than the last url)
-- Change tuhi_kupu_tōkau_kuputohu's name since rāringa_kaituhituhi now does the writing
-- Fix the printouts so that it doesn't say it's fetching pages that aren't being written?
+- Rewrite file after everything else is done to remove any rows without urls
+- Merge tiki_hupa_tūtira and tiki_kupu_tōkau
 - Split up text entries that are evaluated as being under a certain percentage of Māori (like 95%) and evaluate them by paragraph
+- Implement 'classes' for global variables with William
