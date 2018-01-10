@@ -1,7 +1,7 @@
 # nga-kupu
 Identify Māori words in text.
 
-Both scripts have only been tested on python3.
+Both scripts are only intended for python3.
 To install the package, run `python3 setup.py install` from the working directory
 
 `auaha_tūtira_tū` creates the stoplists used in the `kōmiri_kupu` function (which is called in the `kupu_tūtira` script) from a user-provided English corpus. However I have provided such lists in a subfolder referenced throughout the code called `taumahi_tūtira`, created from Google's provided list of 20,000 most commonly used English words. You may recreate these lists from the same corpus or make your own by executing the script thusly.
