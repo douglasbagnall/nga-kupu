@@ -69,6 +69,10 @@ def whakatakirua(tauriterite):
         return 'Wh'
 
 
+keys = ['pākehā', 'rangirua', 'pākehā_kūare_tohutō', 'rangirua_kūare_tohutō']
+kupu_lists = {}
+
+
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # Removes words that contain any English characters from the string above,
     # returns dictionaries of word counts for three categories of Māori words:
@@ -79,29 +83,14 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
-    rootpath = ''
-    try:
-        root = __file__
-        if os.path.islink(root):
-            root = os.path.realpath(root)
-        dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
-    except:
-        print("I'm sorry, but something is wrong.")
-        print("There is no __file__ variable. Please contact the author.")
-        sys.exit()
-
-    # Reads the file lists of English and ambiguous words into list variables
-    kōnae_pākehā, kōnae_rangirua = open(dirpath + "/kupu_kino.txt" if kūare_tohutō else dirpath + "/kupu_kino_kūare_tohutō.txt", "r"), open(
-        dirpath + "/kupu_rangirua.txt" if kūare_tohutō else dirpath + "/kupu_rangirua_kūare_tohutō.txt", "r")
-    kupu_pākehā = kōnae_pākehā.read().split()
-    kupu_rangirua = kōnae_rangirua.read().split()
-    kōnae_pākehā.close(), kōnae_rangirua.close()
+    # Gets the preferred word lists from the preloaded files
+    kupu_rangirua = kupu_lists[keys[1]
+                               ] if kūare_tohutō else kupu_lists[keys[3]]
+    kupu_pākehā = kupu_lists[keys[0]] if kūare_tohutō else kupu_lists[keys[2]]
+    kupu_hou = hōputu(kupu_hou)
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
-
-    kupu_hou, kupu_pākehā, kupu_rangirua = hōputu(
-        kupu_hou), hōputu(kupu_pākehā), hōputu(kupu_rangirua)
 
     # Puts each word through tests to determine which word frequency dictionary
     # it should be referred to. Goes to the ambiguous dictionary if it's in the
@@ -174,8 +163,6 @@ def hihira_raupapa(kupu_hou, kūare_tohutō=False):
 
 def kupu_ratios(text):
     map_Māori, map_ambiguous, map_other = kōmiri_kupu(text)
-    # ambiguous map may include words such as:
-    # ['take', 'Take', 'too', 'Too', 'woo', 'hoo', 'No', 'no', 'Ha', 'ha', 'name', 'one', 'where', 'who', 'We', 'we', 'Nowhere', 'nowhere', 'are', 'he', 'hero', 'here', 'none', 'whoa']
 
     num_Māori = sum(map_Māori.values())
     num_ambiguous = sum(map_ambiguous.values())
@@ -241,3 +228,22 @@ def tiro_kupu_kātū(kupu_tōkau):
     print("\n--- Māori words ---\n", list(raupapa_māori), "\n")
     print("\n--- Ambiguous words ---\n", list(raupapa_rangirua), "\n")
     print("\n--- English words ---\n", list(raupapa_pākehā), "\n")
+
+
+try:
+    root = __file__
+    if os.path.islink(root):
+        root = os.path.realpath(root)
+    dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
+
+    # Reads the file lists of English and ambiguous words into list variables
+    filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt",
+                 "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
+    for key, name in [[keys[i], filenames[i]] for i in range(len(keys))]:
+        with open(dirpath + name, "r") as kōnae:
+            kupu_lists[key] = hōputu(kōnae.read().split())
+except Exception as e:
+    print(e)
+    print("I'm sorry, but something is wrong.")
+    print("There is no __file__ variable. Please contact the author.")
+    sys.exit()
