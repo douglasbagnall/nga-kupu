@@ -17,7 +17,7 @@ def nahanaha(raupapa_māori):
     # list of Māori words in alphabetical order
     tūtira = hōputu(raupapa_māori)
     tūtira = sorted(tūtira, key=lambda kupu: [arapū.index(
-        pūriki) if pūriki in arapū else len(pūriki) + 1 for pūriki in kupu])
+        pūriki) if pūriki in arapū else len(arapū) + 1 for pūriki in kupu])
     return hōputu(tūtira, False)
 
 
@@ -69,6 +69,10 @@ def whakatakirua(tauriterite):
         return 'Wh'
 
 
+keys = ['pākehā', 'rangirua', 'pākehā_kūare_tohutō', 'rangirua_kūare_tohutō']
+kupu_lists = {}
+
+
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # Removes words that contain any English characters from the string above,
     # returns dictionaries of word counts for three categories of Māori words:
@@ -79,29 +83,14 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
-    rootpath = ''
-    try:
-        root = __file__
-        if os.path.islink(root):
-            root = os.path.realpath(root)
-        dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
-    except:
-        print("I'm sorry, but something is wrong.")
-        print("There is no __file__ variable. Please contact the author.")
-        sys.exit()
-
-    # Reads the file lists of English and ambiguous words into list variables
-    kōnae_pākehā, kōnae_rangirua = open(dirpath + "/kupu_kino.txt" if kūare_tohutō else dirpath + "/kupu_kino_kūare_tohutō.txt", "r"), open(
-        dirpath + "/kupu_rangirua.txt" if kūare_tohutō else dirpath + "/kupu_rangirua_kūare_tohutō.txt", "r")
-    kupu_pākehā = kōnae_pākehā.read().split()
-    kupu_rangirua = kōnae_rangirua.read().split()
-    kōnae_pākehā.close(), kōnae_rangirua.close()
+    # Gets the preferred word lists from the preloaded files
+    kupu_rangirua = kupu_lists[keys[1]
+                               ] if kūare_tohutō else kupu_lists[keys[3]]
+    kupu_pākehā = kupu_lists[keys[0]] if kūare_tohutō else kupu_lists[keys[2]]
+    kupu_hou = hōputu(kupu_hou)
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
-
-    kupu_hou, kupu_pākehā, kupu_rangirua = hōputu(
-        kupu_hou), hōputu(kupu_pākehā), hōputu(kupu_rangirua)
 
     # Puts each word through tests to determine which word frequency dictionary
     # it should be referred to. Goes to the ambiguous dictionary if it's in the
@@ -113,13 +102,13 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     # dictionary.
 
     for kupu in kupu_hou:
-        if kupu.lower() in kupu_rangirua:
+        if (kupu.lower() or kupu.lower().translate(tūare_tohutō)) in kupu_rangirua:
             kupu = hōputu(kupu, False)
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
-        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or (kupu.lower() in kupu_pākehā)):
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
             kupu = hōputu(kupu, False)
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
@@ -134,32 +123,39 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
     return raupapa_māori, raupapa_rangirua, raupapa_pākehā
 
 
+def whakatakitahi_oropuare(kupu):
+    return re.sub(r'uu', 'u', re.sub(r'oo', 'o', re.sub(r'ii', 'i', re.sub(r'ee', 'e', re.sub(r'aa', 'a', kupu)))))
+
+
 def hihira_raupapa_kupu(kupu_hou, kūare_tohutō):
     # Looks up a single word to see if it is defined in maoridictionary.co.nz
     # Set kūare_tohutō = False to not ignore macrons when making the match
     # Returns True or False
 
-    kupu = kupu_hou.lower()
+    kupu_huarua = kupu_hou.lower()
     if kūare_tohutō:
-        kupu = kupu.translate(no_tohutō)
-    taukaea = recode_uri(
-        'http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
-    whārangi_ipurangi = urlopen(taukaea)
-    hupa = BeautifulSoup(whārangi_ipurangi, 'html.parser',
-                         from_encoding='utf8')
-
-    tohu = hupa.find_all('h2')
-    for taitara in tohu[:-3]:
-        taitara = taitara.text.lower()
-        if "found 0 matches" in taitara:
-            wāriutanga = False
-            print("Found " + kupu + ": " + str(wāriutanga))
-            return wāriutanga
-        elif kupu in (taitara.translate(no_tohutō) if kūare_tohutō else taitara.split()):
-            wāriutanga = True
-            print("Found " + kupu + ": " + str(wāriutanga))
-            return wāriutanga
+        kupu_huarua = kupu_huarua.translate(no_tohutō)
+    taurua = [kupu_huarua, whakatakitahi_oropuare(kupu_huarua)]
     wāriutanga = False
+
+    for kupu in taurua:
+        taukaea = recode_uri(
+            'http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
+        hupa = BeautifulSoup(urlopen(taukaea), 'html.parser',
+                             from_encoding='utf8')
+
+        tohu = hupa.find_all('h2')
+
+        for taitara in tohu[:-2]:
+            taitara = taitara.text.lower()
+            if "found 0 matches" in taitara:
+                break
+            elif kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
+                wāriutanga = True
+                break
+            else:
+                pass
+
     print("Found " + kupu + ": " + str(wāriutanga))
     return wāriutanga
 
@@ -178,8 +174,6 @@ def hihira_raupapa(kupu_hou, kūare_tohutō=False):
 
 def kupu_ratios(text):
     map_Māori, map_ambiguous, map_other = kōmiri_kupu(text)
-    # ambiguous map may include words such as:
-    # ['take', 'Take', 'too', 'Too', 'woo', 'hoo', 'No', 'no', 'Ha', 'ha', 'name', 'one', 'where', 'who', 'We', 'we', 'Nowhere', 'nowhere', 'are', 'he', 'hero', 'here', 'none', 'whoa']
 
     num_Māori = sum(map_Māori.values())
     num_ambiguous = sum(map_ambiguous.values())
@@ -193,7 +187,7 @@ def kupu_ratios(text):
 
 def get_percentage(num_Māori, num_ambiguous, num_other):
     if num_Māori:
-        return 100 * num_Māori / (num_Māori + num_other)
+        return round(100 * num_Māori / (num_Māori + num_other), 2)
     elif num_other or num_ambiguous <= 10:
         return 0
     else:
@@ -238,10 +232,20 @@ def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
     return raupapa_māori, raupapa_pākehā
 
 
-def tiro_kupu_kātū(kupu_tōkau):
-    # A way to check which words are being evaluated as Māori, ambiguous or pākehā by printing them out in lists
-    raupapa_māori, raupapa_rangirua, raupapa_pākehā = kōmiri_kupu(
-        kupu_tōkau, False)
-    print("\n--- Māori words ---\n", list(raupapa_māori), "\n")
-    print("\n--- Ambiguous words ---\n", list(raupapa_rangirua), "\n")
-    print("\n--- English words ---\n", list(raupapa_pākehā), "\n")
+try:
+    root = __file__
+    if os.path.islink(root):
+        root = os.path.realpath(root)
+    dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
+
+    # Reads the file lists of English and ambiguous words into list variables
+    filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt",
+                 "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
+    for pair in zip(keys, filenames):
+        with open(dirpath + pair[1], "r") as kōnae:
+            kupu_lists[pair[0]] = hōputu(kōnae.read().split())
+except Exception as e:
+    print(e)
+    print("I'm sorry, but something is wrong.")
+    print("There is no __file__ variable. Please contact the author.")
+    sys.exit()

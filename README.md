@@ -15,5 +15,3 @@ To install the package, run `python3 setup.py install` from the working director
 `hihira_raupapa` takes a multilingual corpus and returns two lists. One list of words that are considered to be Māori, and another list of words that are of Māori form (consonant-vowel format, no doubling of consonants, always ends in a vowel, Māori alphabet), but are not considered to be Māori words. It checks them all against http://maoridictionary.co.nz . Use the following format to execute this script.
 
 `python3 hihira_raupapa -i input_file.txt -g output_file1.txt -b output_file2.txt`
-
-`englishwords.txt` is a text file that will soon be incorporated into `kupu_tūtira.py` in order to better scrutinise Māori words. It has been passed through `kupu_tūtira.py` and `dictionarycheck.py` and is the list of Māori form undefined words from a corpus of approximately 15 million English words.

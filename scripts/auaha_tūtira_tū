@@ -5,6 +5,7 @@ import context
 import re
 import sys
 import argparse
+import time
 
 from taumahi import auaha_raupapa_tū, nahanaha, hihira_raupapa
 
@@ -40,6 +41,8 @@ def tuhi_puta_tuhinga(kupu_kino_kūare_tohutō, kupu_kino, kupu_rangirua_kūare_
 
 
 def matua():
+    # Starts recording the time
+    tāti_wā = time.time()
     # Set up the terminal arguments
     whakatukai = argparse.ArgumentParser()
     whakatukai.add_argument(
@@ -63,6 +66,10 @@ def matua():
 
     tuhi_puta_tuhinga(kupu_kino_kūare_tohutō, kupu_kino,
                       kupu_rangirua_kūare_tohutō, kupu_rangirua)
+
+    print(
+        "\n\n----------\n\nAll text has been analysed. The process took {:0.2f} seconds.\n".format(time.time() - tāti_wā))  # Prints out how long the process took in a user friendly format
+    return
 
 
 if __name__ == '__main__':
