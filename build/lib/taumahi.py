@@ -152,12 +152,16 @@ def hihira_raupapa_kupu(kupu_hou, kūare_tohutō):
     for taitara in tohu[:-3]:
         taitara = taitara.text.lower()
         if "found 0 matches" in taitara:
-            return False
-            break
-        elif kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
-            return True
-            break
-    return False
+            wāriutanga = False
+            print("Found " + kupu + ": " + str(wāriutanga))
+            return wāriutanga
+        elif kupu in (taitara.translate(no_tohutō) if kūare_tohutō else taitara.split()):
+            wāriutanga = True
+            print("Found " + kupu + ": " + str(wāriutanga))
+            return wāriutanga
+    wāriutanga = False
+    print("Found " + kupu + ": " + str(wāriutanga))
+    return wāriutanga
 
 
 def hihira_raupapa(kupu_hou, kūare_tohutō=False):
@@ -181,18 +185,19 @@ def kupu_ratios(text):
     num_ambiguous = sum(map_ambiguous.values())
     num_other = sum(map_other.values())
 
-    heMāori = 0
-
-    if num_Māori:
-        heMāori = 100 * num_Māori / (num_Māori + num_other)
-    elif num_other or num_ambiguous <= 10:
-        heMāori = 0
-    else:
-        heMāori = 51
-
+    heMāori = get_percentage(num_Māori, num_ambiguous, num_other)
     save_corpus = heMāori > 50
 
     return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
+
+
+def get_percentage(num_Māori, num_ambiguous, num_other):
+    if num_Māori:
+        return 100 * num_Māori / (num_Māori + num_other)
+    elif num_other or num_ambiguous <= 10:
+        return 0
+    else:
+        return 51
 
 
 def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
@@ -231,3 +236,12 @@ def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
             raupapa_pākehā[kupu] += 1
 
     return raupapa_māori, raupapa_pākehā
+
+
+def tiro_kupu_kātū(kupu_tōkau):
+    # A way to check which words are being evaluated as Māori, ambiguous or pākehā by printing them out in lists
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = kōmiri_kupu(
+        kupu_tōkau, False)
+    print("\n--- Māori words ---\n", list(raupapa_māori), "\n")
+    print("\n--- Ambiguous words ---\n", list(raupapa_rangirua), "\n")
+    print("\n--- English words ---\n", list(raupapa_pākehā), "\n")

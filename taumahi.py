@@ -152,12 +152,16 @@ def hihira_raupapa_kupu(kupu_hou, kūare_tohutō):
     for taitara in tohu[:-3]:
         taitara = taitara.text.lower()
         if "found 0 matches" in taitara:
-            return False
-            break
-        elif kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
-            return True
-            break
-    return False
+            wāriutanga = False
+            print("Found " + kupu + ": " + str(wāriutanga))
+            return wāriutanga
+        elif kupu in (taitara.translate(no_tohutō) if kūare_tohutō else taitara.split()):
+            wāriutanga = True
+            print("Found " + kupu + ": " + str(wāriutanga))
+            return wāriutanga
+    wāriutanga = False
+    print("Found " + kupu + ": " + str(wāriutanga))
+    return wāriutanga
 
 
 def hihira_raupapa(kupu_hou, kūare_tohutō=False):
