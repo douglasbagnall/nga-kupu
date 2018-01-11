@@ -69,8 +69,8 @@ def whakatakirua(tauriterite):
         return 'Wh'
 
 
+# Keys to the kupu_list dictionary:
 keys = ['pākehā', 'rangirua', 'pākehā_kūare_tohutō', 'rangirua_kūare_tohutō']
-kupu_lists = {}
 
 
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
@@ -85,8 +85,9 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
 
     # Gets the preferred word lists from the preloaded files
     kupu_rangirua = kupu_lists[keys[1]
-                               ] if kūare_tohutō else kupu_lists[keys[3]]
-    kupu_pākehā = kupu_lists[keys[0]] if kūare_tohutō else kupu_lists[keys[2]]
+                               ] if not kūare_tohutō else kupu_lists[keys[3]]
+    kupu_pākehā = kupu_lists[keys[0]
+                             ] if not kūare_tohutō else kupu_lists[keys[2]]
     kupu_hou = hōputu(kupu_hou)
 
     # Setting up the dictionaries in which the words in the text will be placed
@@ -230,6 +231,7 @@ def tiro_kupu_kātū(kupu_tōkau):
     print("\n--- English words ---\n", list(raupapa_pākehā), "\n")
 
 
+kupu_lists = {}
 try:
     root = __file__
     if os.path.islink(root):
