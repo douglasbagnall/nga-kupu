@@ -239,9 +239,9 @@ try:
     # Reads the file lists of English and ambiguous words into list variables
     filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt",
                  "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
-    for key, name in [[keys[i], filenames[i]] for i in range(len(keys))]:
-        with open(dirpath + name, "r") as kōnae:
-            kupu_lists[key] = hōputu(kōnae.read().split())
+    for pair in zip(keys, filenames):
+        with open(dirpath + pair[1], "r") as kōnae:
+            kupu_lists[pair[0]] = hōputu(kōnae.read().split())
 except Exception as e:
     print(e)
     print("I'm sorry, but something is wrong.")
