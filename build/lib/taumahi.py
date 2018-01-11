@@ -69,6 +69,7 @@ def whakatakirua(tauriterite):
         return 'Wh'
 
 
+# Keys to the kupu_list dictionary:
 keys = ['pākehā', 'rangirua', 'pākehā_kūare_tohutō', 'rangirua_kūare_tohutō']
 kupu_lists = {}
 
@@ -85,8 +86,9 @@ def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
 
     # Gets the preferred word lists from the preloaded files
     kupu_rangirua = kupu_lists[keys[1]
-                               ] if kūare_tohutō else kupu_lists[keys[3]]
-    kupu_pākehā = kupu_lists[keys[0]] if kūare_tohutō else kupu_lists[keys[2]]
+                               ] if not kūare_tohutō else kupu_lists[keys[3]]
+    kupu_pākehā = kupu_lists[keys[0]
+                             ] if not kūare_tohutō else kupu_lists[keys[2]]
     kupu_hou = hōputu(kupu_hou)
 
     # Setting up the dictionaries in which the words in the text will be placed
@@ -148,9 +150,7 @@ def hihira_raupapa_kupu(kupu_hou, kūare_tohutō):
 
         for taitara in tohu[:-2]:
             taitara = taitara.text.lower()
-            if "found 0 matches" in taitara:
-                break
-            elif kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
+            if kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
                 wāriutanga = True
                 break
             else:

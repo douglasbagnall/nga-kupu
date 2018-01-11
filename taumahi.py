@@ -71,6 +71,7 @@ def whakatakirua(tauriterite):
 
 # Keys to the kupu_list dictionary:
 keys = ['pākehā', 'rangirua', 'pākehā_kūare_tohutō', 'rangirua_kūare_tohutō']
+kupu_lists = {}
 
 
 def kōmiri_kupu(kupu_tōkau, kūare_tohutō=True):
