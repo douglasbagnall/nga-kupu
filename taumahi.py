@@ -264,6 +264,13 @@ new_paragraph = re.compile(
 new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
 
 
+def get_paragraph(txt):
+    paragraph_end = new_paragraph.search(txt)
+    if paragraph_end:
+        return txt[:paragraph_end.start() + 1], txt[paragraph_end.end():]
+    return txt, ''
+
+
 def clean_whitespace(paragraph):
     return re.sub(r'\s+', ' ', paragraph).strip()
 
