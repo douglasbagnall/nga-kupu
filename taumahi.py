@@ -268,10 +268,10 @@ def clean_whitespace(paragraph):
     return re.sub(r'\s+', ' ', paragraph).strip()
 
 
-# Regex to replace all tilda_vowels with macron vowels
-vowel_map = {'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
+# Regex to replace all ~|[A macron] vowels with macron vowels
 vowels = re.compile(r'(A?~|\[A macron\])([aeiouAEIOU])')
+vowel_map = {'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
 
 
 def sub_vowels(txt):
-    return vowels.sub(tilda2tohutō, txt)
+    return vowels.sub(lambda x: vowel_map[x.group(2).lower()], txt)
