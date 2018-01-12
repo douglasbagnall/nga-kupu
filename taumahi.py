@@ -250,8 +250,7 @@ except Exception as e:
     sys.exit()
 
 
-# All following script is for cleaning raw text
-
+# All following script is for cleaning raw text strings:
 
 apostrophes = '‘’\''
 sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
@@ -260,7 +259,7 @@ sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
 new_paragraph = re.compile(
     '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
 
-# Regex to split paragraph into sentences
+# Regex to detect the end of a sentence
 new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
 
 
