@@ -249,3 +249,29 @@ except Exception as e:
     print("I'm sorry, but something is wrong.")
     print("There is no __file__ variable. Please contact the author.")
     sys.exit()
+
+
+# All following script is for cleaning raw text strings:
+
+apostrophes = '‘’\''
+sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
+
+# Regex for detecting the end of a paragraph and beginning of another
+new_paragraph = re.compile(
+    '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
+
+# Regex to detect the end of a sentence
+new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
+
+
+def clean_whitespace(paragraph):
+    return re.sub(r'\s+', ' ', paragraph).strip()
+
+
+# Regex to replace all tilda_vowels with macron vowels
+vowel_map = {'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
+vowels = re.compile(r'(A?~|\[A macron\])([aeiouAEIOU])')
+
+
+def sub_vowels(txt):
+    return vowels.sub(tilda2tohutō, txt)
