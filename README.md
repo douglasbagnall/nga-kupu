@@ -1,4 +1,6 @@
 # nga-kupu
+[![Build Status](https://travis-ci.org/TeHikuMedia/nga-kupu.svg?branch=master)](https://travis-ci.org/TeHikuMedia/nga-kupu)
+
 Identify Māori words in text.
 
 All scripts are only intended for python3.
