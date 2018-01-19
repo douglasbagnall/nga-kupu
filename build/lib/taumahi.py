@@ -150,7 +150,7 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
 
         for taitara in tohu[:-2]:
             taitara = taitara.text.lower()
-            if kupu in (taitara.translate(no_tohutō).split() if kūare_tohutō else taitara.split()):
+            if kupu in (taitara.translate(no_tohutō).split() if tohutō else taitara.split()):
                 wāriutanga = True
                 break
             else:
@@ -160,11 +160,11 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
     return wāriutanga
 
 
-def hihira_raupapa(kupu_hou, kūare_tohutō=False):
+def hihira_raupapa(kupu_hou, tohutō=False):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
-    # Set kūare_tohutō = False to become sensitive to the presence of macrons when making the match
+    # Set tohutō = False to become sensitive to the presence of macrons when making the match
 
-    hihira = [hihira_raupapa_kupu(kupu, kūare_tohutō) for kupu in kupu_hou]
+    hihira = [hihira_raupapa_kupu(kupu, tohutō) for kupu in kupu_hou]
 
     kupu_pai = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if tokorua[0]]
     kupu_kino = [tokorua[1]
@@ -194,11 +194,11 @@ def get_percentage(num_Māori, num_ambiguous, num_other):
         return 51
 
 
-def auaha_raupapa_tū(kupu_tōkau, kūare_tohutō=True):
+def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # Removes words that contain any English characters from the string above,
     # returns dictionaries of word counts for three categories of Māori words:
     # Māori, ambiguous, non-Māori (Pākehā)
-    # Set kūare_tohutō = True to become sensitive to the presence of macrons when making the match
+    # Set tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
@@ -249,3 +249,36 @@ except Exception as e:
     print("I'm sorry, but something is wrong.")
     print("There is no __file__ variable. Please contact the author.")
     sys.exit()
+
+
+# All following script is for cleaning raw text strings:
+
+apostrophes = '‘’\''
+sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
+
+# Regex for detecting the end of a paragraph and beginning of another
+new_paragraph = re.compile(
+    '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
+
+# Regex to detect the end of a sentence
+new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
+
+
+def get_paragraph(txt):
+    paragraph_end = new_paragraph.search(txt)
+    if paragraph_end:
+        return txt[:paragraph_end.start() + 1], txt[paragraph_end.end():]
+    return txt, ''
+
+
+def clean_whitespace(paragraph):
+    return re.sub(r'\s+', ' ', paragraph).strip()
+
+
+# Regex to replace all ~|[A macron] vowels with macron vowels
+vowels = re.compile(r'(A?~|\[A macron\])([aeiouAEIOU])')
+vowel_map = {'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
+
+
+def sub_vowels(txt):
+    return vowels.sub(lambda x: vowel_map[x.group(2).lower()], txt)
