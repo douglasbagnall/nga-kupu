@@ -9,4 +9,4 @@ setup(name='taumahi',
       )
 
 # Uninstall:
-# cd ~/../../usr/local/lib/python3.*/dist-packages \ sudo rm -r taumahi*
+# cd ~/../../usr/local/lib/python3.*/dist-packages ; sudo rm -r taumahi*
