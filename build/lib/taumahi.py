@@ -104,13 +104,13 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
     # dictionary.
 
     for kupu in kupu_hou:
-        if ((kupu.lower() or kupu.lower().translate(tūare_tohutō)) in kupu_rangirua) or len(kupu) == 1:
+        if (kupu.lower() or kupu.lower().translate(tūare_tohutō)) in kupu_rangirua:
             kupu = hōputu(kupu, False)
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
-        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)) or len(kupu) == 1:
             kupu = hōputu(kupu, False)
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
