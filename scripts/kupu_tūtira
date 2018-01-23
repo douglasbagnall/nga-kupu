@@ -47,7 +47,7 @@ def matua():
     # files or prints them to the console depending on user input, in Māori
     # alphabetical order
 
-    tuhi_puta_tuhinga(kōwhiri, nahanaha(kōmiri_kupu(kupu_tōkau)[0]))
+    tuhi_puta_tuhinga(kōwhiri, nahanaha(kōmiri_kupu(kupu_tōkau)[0].keys()))
 
 
 if __name__ == '__main__':

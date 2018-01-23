@@ -12,16 +12,14 @@ no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'
 arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
 
-def nahanaha(raupapa_māori):
-    # Takes a word count dictionary (e.g. output of kōmiri_kupu) and returns the
-    # list of Māori words in alphabetical order
-    tūtira = hōputu(raupapa_māori)
-    tūtira = sorted(tūtira, key=lambda kupu: [arapū.index(
-        pūriki) if pūriki in arapū else len(arapū) + 1 for pūriki in kupu])
-    return hōputu(tūtira, False)
+def nahanaha(tūtira):
+    # Takes a list of strings (e.g. output of kōmiri_kupu) and returns the
+    # list in Māori alphabetical order
+    return sorted(tūtira, key=lambda kupu: [arapū.index(
+        pūriki) if pūriki in arapū else len(arapū) + 1 for pūriki in hōputu(kupu)])
 
 
-def hōputu(kupu, hōputu_takitahi=True):
+def hōputu(kupu):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
     # consonants are easier to deal with in unicode format. It may be passed
     # A list, dictionary, or string, and uses if statements to determine how
@@ -29,21 +27,7 @@ def hōputu(kupu, hōputu_takitahi=True):
     # A string or a list. The Boolean variable determines whether it's encoding
     # Or decoding (set False if decoding)
 
-    if isinstance(kupu, list):
-        if hōputu_takitahi:
-            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu]
-        else:
-            return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu]
-    elif isinstance(kupu, dict):
-        if hōputu_takitahi:
-            return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu.keys()]
-        else:
-            return [re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, whakatomo) for whakatomo in kupu.keys()]
-    else:
-        if hōputu_takitahi:
-            return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
-        else:
-            return re.sub(r'(ŋ)|(ƒ)|(Ŋ)|(Ƒ)', whakatakirua, kupu)
+    return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
 
 
 def whakatakitahi(tauriterite):
@@ -57,19 +41,6 @@ def whakatakitahi(tauriterite):
         return 'Ŋ'
     else:
         return 'Ƒ'
-
-
-def whakatakirua(tauriterite):
-    # If passed the appropriate symbol, return the corresponding letters
-    oro = tauriterite.group(0)
-    if oro == 'ŋ':
-        return 'ng'
-    elif oro == 'ƒ':
-        return 'wh'
-    elif oro == 'Ŋ':
-        return 'Ng'
-    else:
-        return 'Wh'
 
 
 # Keys to the kupu_list dictionary:
@@ -94,7 +65,6 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
                                ] if tohutō else kupu_lists[keys[3]]
     kupu_pākehā = kupu_lists[keys[0]
                              ] if tohutō else kupu_lists[keys[2]]
-    kupu_hou = hōputu(kupu_hou)
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
@@ -109,20 +79,18 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
     # dictionary.
 
     for kupu in kupu_hou:
+        hōputu_kupu = hōputu(kupu)
         if ((kupu.lower() or kupu.lower().translate(tūare_tohutō)) in kupu_rangirua) or len(kupu) == 1:
-            kupu = hōputu(kupu, False)
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
-        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
-            kupu = hōputu(kupu, False)
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
             continue
         else:
-            kupu = hōputu(kupu, False)
             if kupu not in raupapa_pākehā:
                 raupapa_pākehā[kupu] = 0
             raupapa_pākehā[kupu] += 1
@@ -223,8 +191,6 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_pākehā = {}, {}
 
-    kupu_hou = hōputu(kupu_hou)
-
     # Puts each word through tests to determine which word frequency dictionary
     # it should be referred to. Goes to the Māori dictionary if it doesn't have
     # consecutive consonants, doesn't end in a consnant, or doesn't have any
@@ -233,14 +199,13 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # every time the corresponding word gets passed to the dictionary.
 
     for kupu in kupu_hou:
-        if not (re.compile("[{o}][{o}]".format(o=orokati)).search(kupu.lower()) or (kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in kupu.lower())):
-            kupu = hōputu(kupu, False)
+        hōputu_kupu = hōputu(kupu)
+        if not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower())):
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
             continue
         else:
-            kupu = hōputu(kupu, False)
             if kupu not in raupapa_pākehā:
                 raupapa_pākehā[kupu] = 0
             raupapa_pākehā[kupu] += 1
@@ -259,7 +224,7 @@ try:
                  "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
     for pair in zip(keys, filenames):
         with open(dirpath + pair[1], "r") as kōnae:
-            kupu_lists[pair[0]] = hōputu(kōnae.read().split())
+            kupu_lists[pair[0]] = kōnae.read().split()
 except Exception as e:
     print(e)
     print("I'm sorry, but something is wrong.")
