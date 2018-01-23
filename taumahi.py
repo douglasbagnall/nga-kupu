@@ -23,9 +23,12 @@ def nahanaha(raupapa_māori):
 
 def hōputu(kupu, hōputu_takitahi=True):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
-    # consonants are easier to deal with in unicode format
-    # The Boolean variable determines whether it's encoding or decoding
-    # (set False if decoding)
+    # consonants are easier to deal with in unicode format. It may be passed
+    # A list, dictionary, or string, and uses if statements to determine how
+    # To replace the consonants of the constituent words, and wheter to return
+    # A string or a list. The Boolean variable determines whether it's encoding
+    # Or decoding (set False if decoding)
+
     if isinstance(kupu, list):
         if hōputu_takitahi:
             return [re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, whakatomo) for whakatomo in kupu]
@@ -84,7 +87,9 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
     kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
-    # Gets the preferred word lists from the preloaded files
+    # Gets the preferred word lists from the preloaded files, depending on
+    # The Boolean variable, as macronised and demacronised texts have different
+    # Stoplists (files that need to be accessed)
     kupu_rangirua = kupu_lists[keys[1]
                                ] if tohutō else kupu_lists[keys[3]]
     kupu_pākehā = kupu_lists[keys[0]
@@ -126,6 +131,7 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
 
 
 def whakatakitahi_oropuare(kupu):
+    # Replaces doubled vowels with a single vowel. It is passed a string, and returns a string.
     return re.sub(r'uu', 'u', re.sub(r'oo', 'o', re.sub(r'ii', 'i', re.sub(r'ee', 'e', re.sub(r'aa', 'a', kupu)))))
 
 
@@ -135,9 +141,13 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
     # Returns True or False
 
     kupu_huarua = kupu_hou.lower()
+    # If the macrons are not strict, they are removed for the best possibility of finding a match
     if tohutō:
         kupu_huarua = kupu_huarua.translate(no_tohutō)
+    # Sets up an iterable of the word, and the word without double vowels to be searched.
+    # This is because some texts use double vowels instead of macrons, and they return different search results.
     taurua = [kupu_huarua, whakatakitahi_oropuare(kupu_huarua)]
+    # Sets up the variable to be returned, it is changed if a result is found
     wāriutanga = False
 
     for kupu in taurua:
@@ -148,8 +158,10 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
 
         tohu = hupa.find_all('h2')
 
+        # The last two entries are not search results, due to the format of the website.
         for taitara in tohu[:-2]:
             taitara = taitara.text.lower()
+            # Removes capitals and macrons for the best chance of making a match
             if kupu in (taitara.translate(no_tohutō).split() if tohutō else taitara.split()):
                 wāriutanga = True
                 break
@@ -163,10 +175,14 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
 def hihira_raupapa(kupu_hou, tohutō=False):
     # Looks up a list of words to see if they are defined in maoridictionary.co.nz
     # Set tohutō = False to become sensitive to the presence of macrons when making the match
+    # Returns a list of words that are defined, and a list of words that are not defined from the input list.
 
+    # Associates each word with a dictionary check result
     hihira = [hihira_raupapa_kupu(kupu, tohutō) for kupu in kupu_hou]
 
+    # Adds it to the good word list if it passed the check
     kupu_pai = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if tokorua[0]]
+    # Adds it to the bad word list if it failed the check
     kupu_kino = [tokorua[1]
                  for tokorua in zip(hihira, kupu_hou) if not tokorua[0]]
     return kupu_pai, kupu_kino
@@ -195,9 +211,9 @@ def get_percentage(num_Māori, num_ambiguous, num_other):
 
 
 def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
-    # Removes words that contain any English characters from the string above,
-    # returns dictionaries of word counts for three categories of Māori words:
-    # Māori, ambiguous, non-Māori (Pākehā)
+    # This function is used for making stoplists as it does not depend on any stoplists.
+    # It finds all words in a string, and adds them to a dictionary depending on
+    # Whether they look like Māori words or not, and counts their frequency.
     # Set tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
