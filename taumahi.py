@@ -159,20 +159,20 @@ def hihira_raupapa(kupu_hou, tohutō=False):
 def kupu_ratios(text, tohutō=True):
     map_Māori, map_ambiguous, map_other = kōmiri_kupu(text, tohutō)
 
-    num_Māori = sum(map_Māori.values())
-    num_ambiguous = sum(map_ambiguous.values())
-    num_other = sum(map_other.values())
+    nums = {'reo': sum(map_Māori.values(),
+            'ambiguous': sum(map_ambiguous.values(),
+            'other': sum(map_other.values()}
 
-    heMāori = get_percentage(num_Māori, num_ambiguous, num_other)
-    save_corpus = heMāori > 50
+    nums['percent']=get_percentage(**nums)
+    save_corpus=heMāori > 50
 
-    return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
+    return save_corpus, nums
 
 
-def get_percentage(num_Māori, num_ambiguous, num_other):
-    if num_Māori:
-        return round(100 * num_Māori / (num_Māori + num_other), 2)
-    elif num_other or num_ambiguous <= 10:
+def get_percentage(reo, ambiguous, other):
+    if reo:
+        return round(100 * reo / (reo + other), 2)
+    elif other or ambiguous <= 10:
         return 0
     else:
         return 51
@@ -185,11 +185,11 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # Set tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
-    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
+    kupu_hou=re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
         p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
 
     # Setting up the dictionaries in which the words in the text will be placed
-    raupapa_māori, raupapa_pākehā = {}, {}
+    raupapa_māori, raupapa_pākehā={}, {}
 
     # Puts each word through tests to determine which word frequency dictionary
     # it should be referred to. Goes to the Māori dictionary if it doesn't have
@@ -199,32 +199,32 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # every time the corresponding word gets passed to the dictionary.
 
     for kupu in kupu_hou:
-        hōputu_kupu = hōputu(kupu)
+        hōputu_kupu=hōputu(kupu)
         if not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower())):
             if kupu not in raupapa_māori:
-                raupapa_māori[kupu] = 0
+                raupapa_māori[kupu]=0
             raupapa_māori[kupu] += 1
             continue
         else:
             if kupu not in raupapa_pākehā:
-                raupapa_pākehā[kupu] = 0
+                raupapa_pākehā[kupu]=0
             raupapa_pākehā[kupu] += 1
 
     return raupapa_māori, raupapa_pākehā
 
 
 try:
-    root = __file__
+    root=__file__
     if os.path.islink(root):
-        root = os.path.realpath(root)
-    dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
+        root=os.path.realpath(root)
+    dirpath=os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
 
     # Reads the file lists of English and ambiguous words into list variables
-    filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt",
+    filenames=["/kupu_kino.txt", "/kupu_rangirua.txt",
                  "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
     for pair in zip(keys, filenames):
         with open(dirpath + pair[1], "r") as kōnae:
-            kupu_lists[pair[0]] = kōnae.read().split()
+            kupu_lists[pair[0]]=kōnae.read().split()
 except Exception as e:
     print(e)
     print("I'm sorry, but something is wrong.")
@@ -234,19 +234,19 @@ except Exception as e:
 
 # All following script is for cleaning raw text strings:
 
-apostrophes = '‘’\''
-sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
+apostrophes='‘’\''
+sentence_end=['[.!?]', '[{}]*'.format(apostrophes)]
 
 # Regex for detecting the end of a paragraph and beginning of another
-new_paragraph = re.compile(
+new_paragraph=re.compile(
     '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
+new_sentence=re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
-    paragraph_end = new_paragraph.search(txt)
+    paragraph_end=new_paragraph.search(txt)
     if paragraph_end:
         return txt[:paragraph_end.start() + 1], txt[paragraph_end.end():]
     return txt, ''
@@ -257,8 +257,8 @@ def clean_whitespace(paragraph):
 
 
 # Regex to replace all ~|[A macron] vowels with macron vowels
-vowels = re.compile(r'(A?~|\[A macron\])([aeiouAEIOU])')
-vowel_map = {'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
+vowels=re.compile(r'(A?~|\[A macron\])([aeiouAEIOU])')
+vowel_map={'a': 'ā', 'e': 'ē', 'i': 'ī', 'o': 'ō', 'u': 'ū'}
 
 
 def sub_vowels(txt):
