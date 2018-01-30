@@ -213,6 +213,30 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     return raupapa_māori, raupapa_pākehā
 
 
+def tiki_ōrau(kōwae):
+    # Uses the kōmiri_kupu function from the taumahi module to estimate how
+    # Much of the text is Māori. Input is a string of text, output is a percentage string
+
+    # Gets the word frequency dictionaries for the input text
+    raupapa_māori, raupapa_rangirua, raupapa_pākehā = kōmiri_kupu(kōwae, False)
+
+    # Calculates how many words of the Māori and English dictionary there are
+    tatau_māori = sum(raupapa_māori.values())
+    tatau_rangirua = sum(raupapa_rangirua.values())
+    tatau_pākehā = sum(raupapa_pākehā.values())
+    tatau_kapa = tatau_māori + tatau_pākehā
+    tatau_tapeke = tatau_kapa + tatau_rangirua
+
+    # Provided there are some words that are categorised as Māori or English,
+    # It calculates how many Māori words there are compared to the sum, and
+    # Returns the percentage as a string
+    if tatau_kapa != 0:
+        ōrau = round((tatau_māori / tatau_kapa) * 100, 2)
+    else:
+        ōrau = 0.00
+    return tatau_māori, tatau_rangirua, tatau_pākehā, tatau_tapeke, ōrau
+
+
 try:
     root = __file__
     if os.path.islink(root):
