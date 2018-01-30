@@ -159,20 +159,20 @@ def hihira_raupapa(kupu_hou, tohutō=False):
 def kupu_ratios(text, tohutō=True):
     map_Māori, map_ambiguous, map_other = kōmiri_kupu(text, tohutō)
 
-    num_Māori = sum(map_Māori.values())
-    num_ambiguous = sum(map_ambiguous.values())
-    num_other = sum(map_other.values())
+    nums = {'reo': sum(map_Māori.values()),
+            'ambiguous': sum(map_ambiguous.values()),
+            'other': sum(map_other.values()) + len(re.findall('[\d,]+', text))}
 
-    heMāori = get_percentage(num_Māori, num_ambiguous, num_other)
-    save_corpus = heMāori > 50
+    nums['percent'] = get_percentage(**nums)
+    save_corpus = nums['percent'] > 50
 
-    return save_corpus, [num_Māori, num_ambiguous, num_other, heMāori]
+    return save_corpus, nums
 
 
-def get_percentage(num_Māori, num_ambiguous, num_other):
-    if num_Māori:
-        return round(100 * num_Māori / (num_Māori + num_other), 2)
-    elif num_other or num_ambiguous <= 10:
+def get_percentage(reo, ambiguous, other):
+    if reo:
+        return round(100 * reo / (reo + other), 2)
+    elif other or ambiguous <= 10:
         return 0
     else:
         return 51
@@ -258,15 +258,15 @@ except Exception as e:
 
 # All following script is for cleaning raw text strings:
 
-apostrophes = '‘’\''
-sentence_end = ['[.!?]', '[{}]*'.format(apostrophes)]
+apostrophes = '‘’\'"\s'
+sentence_end = ['([.!?]|(:—))', '[{}]+'.format(apostrophes)]
 
 # Regex for detecting the end of a paragraph and beginning of another
 new_paragraph = re.compile(
     '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}{} '.format(sentence_end[0], sentence_end[1]))
+new_sentence = re.compile('{}+{}'.format(sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
