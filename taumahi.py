@@ -259,7 +259,7 @@ except Exception as e:
 # All following script is for cleaning raw text strings:
 
 apostrophes = '‘’\'"\s'
-sentence_end = ['([.!?]|(:—))', '[{}]+'.format(apostrophes)]
+sentence_end = ['([.!?:—"]|,\s*")', '[{}]+'.format(apostrophes)]
 
 # Regex for detecting the end of a paragraph and beginning of another
 new_paragraph = re.compile(
