@@ -259,14 +259,16 @@ except Exception as e:
 # All following script is for cleaning raw text strings:
 
 apostrophes = '‘’\'"\s'
-sentence_end = ['([.!?:—"]|,\s*")', '[{}]+'.format(apostrophes)]
+sentence_end = ['([.!?:—"]+[\)\]]*|,\s*")', '[{}]+'.format(apostrophes)]
 
-# Regex for detecting the end of a paragraph and beginning of another
+# Regex for splitting paragraphs, detecting a p end and beginning of another
 new_paragraph = re.compile(
     '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
+paragraph_pattern = re.compile(
+    '(?<=([.!?]|[-—]))[-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}+{}'.format(sentence_end[0], sentence_end[1]))
+new_sentence = re.compile('{}{}'.format(sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
