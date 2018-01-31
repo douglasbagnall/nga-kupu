@@ -164,7 +164,7 @@ def kupu_ratios(text, tohutō=True):
             'other': sum(map_other.values()) + len(re.findall('[\d]+(,[\d]+)+', text))}
 
     nums['percent'] = get_percentage(**nums)
-    save_corpus = nums['percent'] > 50
+    save_corpus = nums['percent'] >= 50
 
     return save_corpus, nums
 
@@ -172,7 +172,7 @@ def kupu_ratios(text, tohutō=True):
 def get_percentage(reo, ambiguous, other):
     if reo:
         return round(100 * reo / (reo + other), 2)
-    elif other or ambiguous <= 10:
+    elif other:
         return 0
     else:
         return 51
