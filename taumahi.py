@@ -265,10 +265,10 @@ sentence_end = ['([.!?:—"]+[\)\]]*|,\s*")', '[{}]+'.format(apostrophes)]
 new_paragraph = re.compile(
     '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
 paragraph_pattern = re.compile(
-    '(?<=([.!?]|[:-—]))[-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
+    '(?<=([.!?]|[\-—:]))[\-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}{}'.format(sentence_end[0], sentence_end[1]))
+new_sentence = re.compile('{}{}|"—'.format(sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
