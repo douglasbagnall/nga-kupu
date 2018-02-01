@@ -161,7 +161,7 @@ def kupu_ratios(text, tohutō=True):
 
     nums = {'reo': sum(map_Māori.values()),
             'ambiguous': sum(map_ambiguous.values()),
-            'other': sum(map_other.values()) + len(re.findall('[\d]+(,[\d]+)+', text))}
+            'other': sum(map_other.values()) + len(re.findall('[\d]+([,.][\d]+)*', text))}
 
     nums['percent'] = get_percentage(**nums)
     save_corpus = nums['percent'] >= 50
@@ -174,8 +174,10 @@ def get_percentage(reo, ambiguous, other):
         return round(100 * reo / (reo + other), 2)
     elif other:
         return 0
-    else:
+    elif ambiguous:
         return 51
+    else:
+        return 0
 
 
 def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
@@ -258,7 +260,7 @@ except Exception as e:
 
 # All following script is for cleaning raw text strings:
 
-apostrophes = '‘’\'"\s'
+apostrophes = '‘’\'"“\s'
 sentence_end = ['([.!?:—"]+[\)\]]*|,\s*")', '[{}]+'.format(apostrophes)]
 
 # Regex for splitting paragraphs, detecting a p end and beginning of another
@@ -268,7 +270,8 @@ paragraph_pattern = re.compile(
     '(?<=([.!?]|[\-—:]))[\-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}{}|"—'.format(sentence_end[0], sentence_end[1]))
+new_sentence = re.compile('{}{}|[”"]—'.format(
+    sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
