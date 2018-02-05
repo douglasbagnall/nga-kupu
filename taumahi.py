@@ -261,7 +261,7 @@ except Exception as e:
 # All following script is for cleaning raw text strings:
 
 apostrophes = '‘’\'"“”\s'
-sentence_end = ['([.!?:—"“]+[\)\]]*|,\s*["“”])', '[{}]+'.format(apostrophes)]
+sentence_end = ['([.!?:—"“]+[\)\]]*|,\s*[\'"“”])', '[{}]+'.format(apostrophes)]
 
 # Regex for splitting paragraphs, detecting a p end and beginning of another
 new_paragraph = re.compile(
