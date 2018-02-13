@@ -3,3 +3,6 @@ __pycache__/*
 *.pyc
 build*
 build/*
+aotearoa-nz.csv
+gaz_names.csv
+
