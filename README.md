@@ -25,3 +25,12 @@ python3 hihira_raupapa -i input_file.txt -g output_file1.txt -b output_file2.txt
 ```
 python3 auaha_tūtira_tū -i input_file
 ```
+
+## Example usage
+
+The directory `examples/gazette` uses the `kōmiri_kupu` function in the `ngā-kupu` library to identify Māori placenames in the New Zealand gazette of placenames.  In the map below, red and blue markers indicate Māori and non-Māori placenames, respectively.
+
+![Māori placenames in New Zealand](https://github.com/TeHikuMedia/nga-kupu/blob/master/examples/gazette/aotearoa-nz.png)
+
+
+
