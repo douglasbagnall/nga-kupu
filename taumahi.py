@@ -23,11 +23,7 @@ def nahanaha(tūtira):
 
 def hōputu(kupu):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
-    # consonants are easier to deal with in unicode format. It may be passed
-    # A list, dictionary, or string, and uses if statements to determine how
-    # To replace the consonants of the constituent words, and wheter to return
-    # A string or a list. The Boolean variable determines whether it's encoding
-    # Or decoding (set False if decoding)
+    # consonants are easier to deal with in unicode format.
 
     return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
 
