@@ -27,20 +27,14 @@ def hōputu(kupu):
     # Replaces ng and wh, w', w’ with ŋ and ƒ respectively, since Māori
     # consonants are easier to deal with in unicode format.
 
-    return re.sub(r'(w\')|(w’)|(wh)|(ng)|(W\')|(W’)|(Wh)|(Ng)|(WH)|(NG)', whakatakitahi, kupu)
+    # Wh, WH, Ng, NG are mapped to upper case Ƒ and Ŋ, but
+    # wH and nG are not changed.
+    kupu = re.sub(r'W[hH\'’]', WH_UPPER(), kupu)
+    kupu = re.sub(r'w[h\'’]', WH, kupu)
+    kupu = re.sub(r'N[gG]', NG_UPPER(), kupu)
+    kupu = kupu.replace('ng', NG)
 
-
-def whakatakitahi(tauriterite):
-    # If passed the appropriate letters, return the corresponding symbol
-    oro = tauriterite.group(0)
-    if oro == 'ng':
-        return 'ŋ'
-    elif oro == 'w\'' or oro == 'w’' or oro == 'wh':
-        return 'ƒ'
-    elif oro == 'Ng' or oro == 'NG':
-        return 'Ŋ'
-    else:
-        return 'Ƒ'
+    return kupu
 
 
 # Keys to the kupu_list dictionary:
