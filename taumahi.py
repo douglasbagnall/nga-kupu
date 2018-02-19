@@ -10,6 +10,9 @@ orokati = "hkmnprtwŋƒ"
 kūare_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
+# In case you can't work out what these are
+WH = 'ƒ' # U+0192 LATIN SMALL LETTER F WITH HOOK
+NG = 'ŋ' # U+014B LATIN SMALL LETTER ENG
 
 def nahanaha(tūtira):
     # Takes a list of strings (e.g. output of kōmiri_kupu) and returns the
