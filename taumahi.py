@@ -1,7 +1,6 @@
 import re
 import os
 import sys
-import argparse
 from yelp_uri.encoding import recode_uri
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -15,8 +14,8 @@ arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 def nahanaha(tūtira):
     # Takes a list of strings (e.g. output of kōmiri_kupu) and returns the
     # list in Māori alphabetical order
-    return sorted(tūtira, key=lambda kupu: [arapū.index(
-        pūriki) if pūriki in arapū else len(arapū) + 1 for pūriki in hōputu(kupu)])
+    return sorted(tūtira, key=lambda kupu: [arapū.index(pūriki) if pūriki in arapū else len(arapū) + 1 for pūriki in
+                                            hōputu(kupu)])
 
 
 def hōputu(kupu):
@@ -55,16 +54,14 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
     # Set tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
-    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
-        p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
+    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(p='[a-zāēīōū\-’\']'), kupu_tōkau,
+                          flags=re.IGNORECASE)
 
     # Gets the preferred word lists from the preloaded files, depending on
     # The Boolean variable, as macronised and demacronised texts have different
     # Stoplists (files that need to be accessed)
-    kupu_rangirua = kupu_lists[keys[1]
-                               ] if tohutō else kupu_lists[keys[3]]
-    kupu_pākehā = kupu_lists[keys[0]
-                             ] if tohutō else kupu_lists[keys[2]]
+    kupu_rangirua = kupu_lists[keys[1]] if tohutō else kupu_lists[keys[3]]
+    kupu_pākehā = kupu_lists[keys[0]] if tohutō else kupu_lists[keys[2]]
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_rangirua, raupapa_pākehā = {}, {}, {}
@@ -85,7 +82,9 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
             continue
-        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower()) or ((kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
+        elif not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (
+                hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower()) or (
+                          (kupu.lower() or whakatakitahi_oropuare(kupu)) in kupu_pākehā)):
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
@@ -121,8 +120,7 @@ def hihira_raupapa_kupu(kupu_hou, tohutō):
     for kupu in taurua:
         taukaea = recode_uri(
             'http://maoridictionary.co.nz/search?idiom=&phrase=&proverb=&loan=&histLoanWords=&keywords=' + kupu)
-        hupa = BeautifulSoup(urlopen(taukaea), 'html.parser',
-                             from_encoding='utf8')
+        hupa = BeautifulSoup(urlopen(taukaea), 'html.parser', from_encoding='utf8')
 
         tohu = hupa.find_all('h2')
 
@@ -151,8 +149,7 @@ def hihira_raupapa(kupu_hou, tohutō=False):
     # Adds it to the good word list if it passed the check
     kupu_pai = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if tokorua[0]]
     # Adds it to the bad word list if it failed the check
-    kupu_kino = [tokorua[1]
-                 for tokorua in zip(hihira, kupu_hou) if not tokorua[0]]
+    kupu_kino = [tokorua[1] for tokorua in zip(hihira, kupu_hou) if not tokorua[0]]
     return kupu_pai, kupu_kino
 
 
@@ -187,8 +184,8 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
     # Set tohutō = True to become sensitive to the presence of macrons when making the match
 
     # Splits the raw text along characters that a
-    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(
-        p='[a-zāēīōū\-’\']'), kupu_tōkau, flags=re.IGNORECASE)
+    kupu_hou = re.findall('(?!-)(?!{p}*--{p}*)({p}+)(?<!-)'.format(p='[a-zāēīōū\-’\']'), kupu_tōkau,
+                          flags=re.IGNORECASE)
 
     # Setting up the dictionaries in which the words in the text will be placed
     raupapa_māori, raupapa_pākehā = {}, {}
@@ -202,7 +199,8 @@ def auaha_raupapa_tū(kupu_tōkau, tohutō=True):
 
     for kupu in kupu_hou:
         hōputu_kupu = hōputu(kupu)
-        if not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower())):
+        if not (re.compile("[{o}][{o}]".format(o=orokati)).search(hōputu_kupu.lower()) or (
+                hōputu_kupu[-1].lower() in orokati) or any(pūriki not in arapū for pūriki in hōputu_kupu.lower())):
             if kupu not in raupapa_māori:
                 raupapa_māori[kupu] = 0
             raupapa_māori[kupu] += 1
@@ -232,10 +230,8 @@ def tiki_ōrau(kōwae):
     # Provided there are some words that are categorised as Māori or English,
     # It calculates how many Māori words there are compared to the sum, and
     # Returns the percentage as a string
-    if tatau_kapa != 0:
-        ōrau = round((tatau_māori / tatau_kapa) * 100, 2)
-    else:
-        ōrau = 0.00
+    ōrau = 0.00 if (not tatau_kapa != 0) else round((tatau_māori / tatau_kapa) * 100, 2)
+
     return tatau_māori, tatau_rangirua, tatau_pākehā, tatau_tapeke, ōrau
 
 
@@ -246,8 +242,8 @@ try:
     dirpath = os.path.dirname(os.path.abspath(root)) + '/taumahi_tūtira'
 
     # Reads the file lists of English and ambiguous words into list variables
-    filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt",
-                 "/kupu_kino_kūare_tohutō.txt", "/kupu_rangirua_kūare_tohutō.txt"]
+    filenames = ["/kupu_kino.txt", "/kupu_rangirua.txt", "/kupu_kino_kūare_tohutō.txt",
+                 "/kupu_rangirua_kūare_tohutō.txt"]
     for pair in zip(keys, filenames):
         with open(dirpath + pair[1], "r") as kōnae:
             kupu_lists[pair[0]] = kōnae.read().split()
@@ -257,27 +253,24 @@ except Exception as e:
     print("There is no __file__ variable. Please contact the author.")
     sys.exit()
 
-
 # All following script is for cleaning raw text strings:
 
 apostrophes = '‘’\'"“”\s'
 sentence_end = ['([.!?:—"“]+[\)\]]*|,\s*[\'"“”])', '[{}]+'.format(apostrophes)]
 
 # Regex for splitting paragraphs, detecting a p end and beginning of another
-new_paragraph = re.compile(
-    '({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
-paragraph_pattern = re.compile(
-    '(?<=([.!?]|[\-—:]))[\-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
+new_paragraph = re.compile('({}+|-+){}\n'.format(sentence_end[0], sentence_end[1]))
+# Version 2:
+paragraph_pattern = re.compile('(?<=([.!?]|[\-—:]))[\-—.!? ‘’\'"•]*\n["\']*(?=[A-Z])')
 
 # Regex to detect the end of a sentence
-new_sentence = re.compile('{}{}|["“”]—?'.format(
-    sentence_end[0], sentence_end[1]))
+new_sentence = re.compile('{}{}|["“”]—?'.format(sentence_end[0], sentence_end[1]))
 
 
 def get_paragraph(txt):
-    paragraph_end = new_paragraph.search(txt)
+    paragraph_end = paragraph_pattern.search(txt)
     if paragraph_end:
-        return txt[:paragraph_end.start() + 1], txt[paragraph_end.end():]
+        return txt[:paragraph_end.start()], txt[paragraph_end.end():]
     return txt, ''
 
 
