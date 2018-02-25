@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 oropuare = "aāeēiīoōuū"
 orokati = "hkmnprtwŋƒ"
-no_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
+kūare_tohutō = ''.maketrans({'ā': 'a', 'ē': 'e', 'ī': 'i', 'ō': 'o', 'ū': 'u'})
 arapū = "AaĀāEeĒēIiĪīOoŌōUuŪūHhKkMmNnPpRrTtWwŊŋƑƒ-"
 
 
@@ -77,7 +77,7 @@ def kōmiri_kupu(kupu_tōkau, tohutō=True):
 
     for kupu in kupu_hou:
         hōputu_kupu = hōputu(kupu)
-        if ((kupu.lower() or kupu.lower().translate(tūare_tohutō)) in kupu_rangirua) or len(kupu) == 1:
+        if ((kupu.lower() or kupu.lower().translate(kūare_tohutō)) in kupu_rangirua) or len(kupu) == 1:
             if kupu not in raupapa_rangirua:
                 raupapa_rangirua[kupu] = 0
             raupapa_rangirua[kupu] += 1
